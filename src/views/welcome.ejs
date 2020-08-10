@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>
+        <%=title%>
+    </title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="welcome-bg">
+    <main>
+        <header class="text-center">
+            <h1>Pax Choir Knust Elections
+                <script>
+                    document.write(new Date().getFullYear())
+                </script>
+            </h1>
+            <p class="h3">Welcome</p>
+        </header>
+        <div class="mt-5">
+            <div class="card login__form">
+                <div class="card-body">
+                    <div class="card-title login__form--header"></div>
+                    <div class="card-nav">
+                        <nav>
+                            <a href="/voter" class="btn"><i class="fas fa-users fa-5x"></i> Voter</a>
+                            <a href="/ec" class="btn"> <i class="fas fa-user-cog fa-5x"></i> Admin</a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <%- include('includes/footer') -%>
+        <script src="js/app.js"></script>
+</body>
+
+</html>

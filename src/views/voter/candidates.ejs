@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>
+        <%=title%>
+    </title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body class="vapp">
+    <%- include('../includes/header')-%>
+        <main class="mt-5">
+            <div class="container">
+                <p class="text-center">Please Click on the box below the candidate of your choice to cast your vote</p>
+                <div class="candidates">
+                    <div class="row">
+                        <div class="candidate col-sm-auto">
+                            <figure>
+                                <img src="../images/assets/avatar1.jpeg" alt="Elephant at sunset">
+                                <figcaption>An elephant at sunset</figcaption>
+                            </figure>
+                            <input type="radio" name="<%=position%>" value="candidate1">
+                        </div>
+                        <div class="candidate col-sm-auto">
+                            <figure>
+                                <img src="../images/assets/avatar1.jpeg" alt="Elephant at sunset">
+                                <figcaption>An elephant at sunset</figcaption>
+                            </figure>
+                            <input type="radio" name="<%=position%>" value="candidate1">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn__continue">Next</button>
+                </div>
+
+            </div>
+        </main>
+        <%- include('../includes/footer') -%>
+</body>
+
+</html>

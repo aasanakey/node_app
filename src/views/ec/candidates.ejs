@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("../includes/dash/head")-%>
+        <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+        <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+</head>
+
+<body class="sb-nav-fixed ec-dashboard">
+    <%- include('../includes/dash/topnav') -%>
+        <div id="layoutSidenav">
+            <%- include('../includes/dash/sidenav') -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <div class="card mb-4 mt-5">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="controls col-md-12">
+                                            <span>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#exampleModal">
+                                            Add Candidates
+                                        </button>
+                                    </span>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <%- include('../includes/messages') -%>
+                                        </div>
+                                    </div>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Enter Candidate Detials</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <%if(elections){%>
+                                                        <form id="addElectionCandidates" action="/ec/candidates" method="POST">
+                                                            <div class="form-row">
+                                                                <div class="input-group mb-3">
+                                                                    <div class="input-group-prepend">
+                                                                        <label class="input-group-text" for="candidateFormSelectElection">Election</label>
+                                                                    </div>
+                                                                    <select class="custom-select" id="candidateFormSelectElection" name="election_id">
+                                                            <option value="" selected>Choose...</option>
+                                                            <%elections.forEach(function(election){%>
+                                                            <option value="<%=election._id%>"><%=election.name%>
+                                                            </option>
+                                                            <%})%>
+                                                        </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-row">
+                                                                <div class="form-group col-md-6">
+                                                                    <label for="name">Name</label>
+                                                                    <input type="text" class="form-control" name="name" id="name" autocomplete="name" required aria-required="true">
+                                                                </div>
+                                                                <div class="form-group col-md-6 ">
+                                                                    <label for="position">Position</label>
+                                                                    <input type="position" class="form-control" name="position" id="position" autocomplete="position" required aria-required="true">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-row">
+                                                                <div class="col-md-12">
+                                                                    <label for="avatar">Picture</label>
+                                                                    <input type="file" name="avatar" id="avatar" class="filepond">
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                        <%}else{%>
+                                                            <div class="">
+                                                                <p class="h4">No election available</p>
+                                                            </div>
+                                                            <%}%>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('addElectionCandidates').submit();">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container-fluid">
+                                <div class="mt-5">
+                                    <%if(elections){%>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputGroupSelectElection">Select
+                                                        Election</label>
+                                            </div>
+                                            <select class="custom-select" id="inputGroupSelectElection">
+                                                    <option value="" selected>Choose...</option>
+                                                    <%elections.forEach(function(election){%>
+                                                    <option value="<%=election._id%>"><%=election.name%></option>
+                                                    <%})%>
+                                                </select>
+                                        </div>
+                                        <!-- candidates -->
+                                        <%}else{%>
+                                            <p class="h3">No elections available</p>
+                                            <%}%>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../includes/dash/footer')-%>
+                </div>
+        </div>
+        <%- include('../includes/dash/scripts') -%>
+            <!-- filepond dependencies for fileupload -->
+            <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+            <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+            <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
+            <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
+            <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+            <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $("#inputGroupSelectElection").on("change", function(e) {
+                        let id = e.target.value;
+                        console.log(id);
+                        $.ajax({
+                            url: `/ec/candidates?id=${id}`,
+                            success: function(res) {
+                                console.log(res);
+                                if (res.msg == "Invalid id") {
+                                    $('#messages').append(
+                                        `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            ${res.msg}: Please select a valid election
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                } else {
+                                    if (res.length > 0) {
+                                        res.forEach(function(position) {
+                                            let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
+                                        })
+                                    } else {
+
+                                        $(".candidates-wrapper").html(`<div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                            <p class="h3">No Candidates available. Please add candidates</p>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    }
+                                }
+                            },
+                            error: function(error) {
+                                console.log(error);
+                            }
+                        })
+                    })
+
+                    // filepond setup
+                    FilePond.registerPlugin(
+                        FilePondPluginImagePreview,
+                        FilePondPluginFileValidateSize,
+                        FilePondPluginImageResize,
+                        FilePondPluginImageTransform,
+                        FilePondPluginFileEncode,
+                    )
+
+                    FilePond.setOptions({
+                        stylePanelAspectRatio: 100 / 100,
+                        imageResizeTargetWidth: 100,
+                        imageResizeTargetHeight: 100,
+                        maxFileSize: '100KB'
+                    })
+
+                    FilePond.parse(document.body);
+                })
+            </script>
+</body>
+
+</html>

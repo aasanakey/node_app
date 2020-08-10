@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>
+        <%=title%>
+    </title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="welcome-bg">
+    <main>
+        <header class="text-center">
+            <h1>Pax Choir Knust Elections
+                <script>
+                    document.write(new Date().getFullYear())
+                </script>
+            </h1>
+            <p class="h3">Welcome</p>
+            <p class="h5">Please Login to continue</p>
+        </header>
+        <div class="container auth-msg">
+            <%- include('../includes/messages') -%>
+        </div>
+        <div class="mt-5">
+            <div class="card login__form">
+                <div class="card-body">
+                    <div class="card-title login__form--header"></div>
+                    <div class="card-subtitle text-muted">
+                        <nav>
+                            <a href="/" class="btn">Home</a>
+                            <a href="/voter" class="btn">Vote</a>
+                        </nav>
+                    </div>
+                    <form action="/ec" method="post" class="mt-5">
+                        <div class="form-group row">
+                            <label for="username" class="col-sm-2 col-form-label">Username</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="username" id="username" autocomplete="username" autofocus required aria-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="current-password" class="col-sm-2 col-form-label">Password</label>
+                            <div class="col-sm-10 position-relative">
+                                <input type="password" name="current-password" class="form-control" id="current-password" required aria-required="true" autocomplete="current-password" aria-describedby="password-constraints">
+                                <i class="pass__toggle--visibility fas fa-eye" title="Show password" role="button"></i>
+                            </div>
+                        </div>
+                        <div class="form-group g-center">
+                            <button type="submit" class="btn offset-sm-2">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <%- include('../includes/footer') -%>
+        <script src="js/app.js"></script>
+</body>
+
+</html>

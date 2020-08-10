@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("../includes/dash/head")-%>
+</head>
+
+<body class="sb-nav-fixed ec-dashboard">
+    <%- include('../includes/dash/topnav') -%>
+        <div id="layoutSidenav">
+            <%- include('../includes/dash/sidenav') -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <div class="card mb-4 mt-5">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="controls col-md-12">
+                                            <span>
+
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#exampleModal">
+                                            New Election
+                                        </button>
+
+                                    </span>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <%- include('../includes/messages') -%>
+                                        </div>
+                                    </div>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Enter Admin Detials</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="createElection" action="/ec/elections" method="POST">
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-12">
+                                                                <label for="name">Election Period</label>
+                                                                <!-- <input type="text" class="form-control" name="name" id="name" required aria-required="true"> -->
+                                                                <select class="custom-select" name="name" id="name" required aria-required="true">
+                                                            <option value="">select an option</option>
+                                                        </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-row">
+                                                            <div class="form-row">
+                                                                <div class="form-group col-sm-6">
+                                                                    <label for="start">Starting Date</label>
+                                                                    <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                                                        <input type="text" name="start" id="start" class="form-control datetimepicker-input" data-target="#datetimepicker1" />
+                                                                        <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group col-sm-6">
+                                                                    <label for="end">Ending Date</label>
+                                                                    <div class="input-group date" id="datetimepicker9" data-target-input="nearest">
+                                                                        <input type="text" name="end" id="end" class="form-control datetimepicker-input" data-target="#datetimepicker9" />
+                                                                        <div class="input-group-append" data-target="#datetimepicker9" data-toggle="datetimepicker">
+                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('createElection').submit();">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container mt-5 text-center">
+                                <caption>
+                                    <p class="h3">Election List</p>
+                                </caption>
+                                <table id="elections" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th hidden>ID</th>
+                                            <th>Name</th>
+                                            <th>Starts</th>
+                                            <th>Ends</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <% elections.forEach(function(election){ %>
+                                            <tr>
+                                                <td hidden>
+                                                    <%= election._id%>
+                                                </td>
+                                                <td>
+                                                    <%= election.name%>
+                                                </td>
+                                                <td>
+                                                    <%= election.start%>
+                                                </td>
+                                                <td>
+                                                    <%= election.end%>
+                                                </td>
+                                                <td>
+                                                    <%= election.status%>
+                                                </td>
+                                                <td>
+                                                    <%if(election.status === "pending"){%>
+                                                        <button type="button" class="btn btn-small btn-primary start-btn">start</button>
+                                                        <%}else if(election.status === "active"){%>
+                                                            <button type="button" class="btn btn-small btn-primary end-btn">end</button>
+                                                            <%}%>
+                                                                <button type="button" title="Delete" class="btn btn-small btn-primary mt-3 delete-btn"><i
+                                                class="fas fa-trash-alt"></i></button>
+
+                                                </td>
+                                            </tr>
+                                            <%});%>
+                                    </tbody>
+                                    <tfoot>
+                                        <th hidden>ID</th>
+                                        <th>Name</th>
+                                        <th>Starts</th>
+                                        <th>Ends</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tfoot>
+
+                                </table>
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../includes/dash/footer')-%>
+                </div>
+        </div>
+        <%- include('../includes/dash/scripts') -%>
+
+            <script>
+                $(document).ready(() => {
+                    (function() {
+                        let current = new Date().getFullYear();
+                        $('select#name').append(`<option value="${current - 1}/${current}">${current - 1}/${current}</option>`);
+                        $('select#name').append(`<option value="${current}/${current + 1}">${current}/${current + 1}</option>`);
+                    })();
+
+
+                    $('#datetimepicker1 #datetimepicker9').datetimepicker({
+                        icons: {
+                            time: "fa fa-clock-o",
+                            date: "fa fa-calendar",
+                            up: "fa fa-arrow-up",
+                            down: "fa fa-arrow-down"
+                        }
+                    });
+
+                    let table = $('#elections').DataTable();
+                    table.on('click', '.delete-btn', function(e) {
+                        // console.log(e)
+                        var tr = $(e.target).closest('tr');
+                        var data = table.row(tr).data();
+                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                            $.ajax({
+                                url: '/ec/elections',
+                                method: 'DELETE',
+                                data: {
+                                    id: data[0],
+                                },
+                                success: function(res) {
+                                    console.log(res);
+                                    if (res.msg == "Invalid id") {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            Can't delete election: ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    } else {
+                                        $('#messages').append(
+                                            `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                        let clear = setTimeout(function() {
+                                            window.location.reload();
+                                        }, 3000);
+                                        //clearInterval(clear);
+                                    }
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            })
+                        }
+                    });
+                    table.on('click', '.start-btn', function(e) {
+                        var tr = $(e.target).closest('tr');
+                        var data = table.row(tr).data();
+                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                            $.ajax({
+                                url: '/ec/elections/start',
+                                method: 'PATCH',
+                                data: {
+                                    status: "active",
+                                    id: data[0],
+                                },
+                                success: function(res) {
+                                    console.log(res);
+                                    if (res.msg == "Invalid id") {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            Can't end election: ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    } else {
+                                        $('#messages').append(
+                                            `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                        let clear = setTimeout(function() {
+                                            window.location.reload();
+                                        }, 3000);
+                                        //clearInterval(clear);
+
+                                    }
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            })
+                        }
+
+                    });
+                    table.on('click', '.end-btn', function(e) {
+                        var tr = $(e.target).closest('tr');
+                        var data = table.row(tr).data();
+                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                            $.ajax({
+                                url: '/ec/elections/end',
+                                method: 'PATCH',
+                                data: {
+                                    status: "ended",
+                                    id: data[0],
+                                },
+                                success: function(res) {
+                                    console.log(res);
+                                    if (res.msg == "Invalid id") {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            Can't end election: ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    } else {
+                                        $('#messages').append(
+                                            `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                        let clear = setTimeout(function() {
+                                            window.location.reload();
+                                        }, 3000);
+                                        //clearInterval(clear);
+
+                                    }
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            })
+                        }
+
+                    });
+                });
+            </script>
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+<div class="text-center mt-4">
+    <!-- display messages produced at client side -->
+    <div id="messages"></div>
+    <!-- display messages produces at server side -->
+    <%if(_session){%>
+        <!-- success messages -->
+        <% if(_session.success != ''){ %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= _session.success %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <% } %>
+                <!-- display error messages -->
+                <% if( _session.errors != ''){ %>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <%= _session.errors %>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+                    </div>
+                    <% }%>
+                        <!-- authentication errors -->
+                        <% if( _session.passport != ''){ %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <%= _session.passport %>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+                            </div>
+                            <% }%>
+                                <!-- input validation errors -->
+                                <%if( _session.validationResult){%>
+                                    <% _session.validationResult.forEach(error =>{%>
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <%= error.msg %>
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button></div>
+                                        <%})%>
+                                            <% }%>
+                                                <% }%>
+</div>

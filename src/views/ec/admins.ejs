@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include("../includes/dash/head")-%>
+</head>
+
+<body class="sb-nav-fixed ec-dashboard">
+    <%- include('../includes/dash/topnav') -%>
+        <div id="layoutSidenav">
+            <%- include('../includes/dash/sidenav') -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid">
+                            <div class="card mb-4 mt-5">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="controls col-md-12">
+                                            <span>
+
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#exampleModal">
+                                            New Admin
+                                        </button>
+
+                                    </span>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <%- include('../includes/messages') -%>
+                                        </div>
+                                    </div>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Enter Admin Detials</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="createAdmin" action="/ec/admins" method="POST">
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-auto">
+                                                                <label for="username">Username</label>
+                                                                <input type="text" class="form-control" name="username" id="username" autocomplete="username" required aria-required="true">
+                                                            </div>
+                                                            <div class="form-group col-md-auto ">
+                                                                <label for="password">Password</label>
+                                                                <div class="position-relative">
+                                                                    <input type="password" class="form-control" name="new-password" id="password" autocomplete="current-password" required aria-required="true">
+                                                                    <i class="pass__toggle--visibility fas fa-eye" title="Show password" role="button"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('createAdmin').submit();">Add</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container mt-5 text-center">
+                                <caption>
+                                    <p class="h3">Admins</p>
+                                </caption>
+                                <table id="admins" class="table table-striped table-bordered">
+                                    <thead>
+                                        <th hidden>ID</th>
+                                        <th>Admin</th>
+                                        <th>Action</th>
+                                    </thead>
+                                    <tbody>
+                                        <%admins.forEach(admin=>{%>
+                                            <tr>
+                                                <td hidden>
+                                                    <%=admin._id%>
+                                                </td>
+                                                <td>
+                                                    <%=admin.username%>
+                                                </td>
+                                                <td>
+                                                    <button type="button" title="Delete record" class="btn btn-small btn-primary delete-btn"><i
+                                                class="fas fa-trash-alt"></i></button>
+                                                </td>
+                                            </tr>
+                                            <%})%>
+                                    </tbody>
+                                    <tfoot>
+                                        <th hidden>ID</th>
+                                        <th>Admin</th>
+                                        <th>Action</th>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../includes/dash/footer')-%>
+                </div>
+        </div>
+        <%- include('../includes/dash/scripts') -%>
+            <script>
+                $(document).ready(function() {
+                    var table = $('#admins').DataTable();
+                    table.on('click', '.delete-btn', function(e) {
+                        var tr = $(e.target).closest('tr');
+                        var data = table.row(tr).data();
+                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                            $.ajax({
+                                url: '/ec/admins',
+                                method: 'DELETE',
+                                data: {
+                                    id: data[0],
+                                    username: data[1]
+                                },
+                                success: function(res) {
+                                    console.log(res);
+                                    // msg = JSON.stringify(msg)
+                                    $('#messages').append(
+                                        `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>`);
+                                    //wait for 1 min and reload page
+                                    let clear = setTimeout(function() {
+                                        location.reload()
+                                    }, 3000);
+                                    // clearInterval(clear);
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            })
+                        }
+                    });
+                });
+            </script>
+</body>
+
+</html>
