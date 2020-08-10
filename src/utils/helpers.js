@@ -12,6 +12,7 @@ module.exports = {
     mimeTypes,
     extractFilePondEncodedImage(encodedFile) {
         if (encodedFile == null) return;
+        // try {
         const fileData = JSON.parse(encodedFile);
         if (fileData !== null && mimeTypes.includes(fileData.type)) {
             return {
@@ -19,6 +20,9 @@ module.exports = {
                 type: fileData.type
             };
         }
+        // } catch (error) {
+        //     console.log(error);
+        // }
     }
 };
 

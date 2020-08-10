@@ -14,22 +14,57 @@ const { ObjectId } = require("mongodb");
 const { hash, extractFilePondEncodedImage } = require("../utils/helpers");
 const { validationResult } = require("express-validator");
 
-// TODO
+// TODO  valid p- 5f312ae0280ddf0c98c16406  np-5f313d622378f422c81ada25   invalid -5f2f620f862d5d0954091c27
 async function addCandidate(candidate) {
+    //exit if candidate object does'nt have the required properties
+    if (!candidate.election_id && !candidate.position) return false;
     // obtain the elections document from the database
-    const positions = await getElections({
+    const result = await getElections({
         _id: ObjectId(candidate.election_id)
-    }, {
-        projection: {
-            _id: false,
-            name: false,
-            start: false,
-            end: false,
-            status: false
-        }
     });
-    console.log(typeof positions);
-    return positions;
+    const election = result.length === 1 ? result[0] : null;
+    if (election === null) return false;
+    let positions = election.positions;
+    /**
+     * check if election document has  positions field object
+     * if not we create one and add candidate to the candidates array
+     * if document has positions field object we add new candidate to the positions candidates array
+     */
+    // console.log("before if", positions);
+    if (positions === undefined) {
+        // console.log("in if 1", positions);
+        let posObj = {};
+        posObj[candidate.position] = [{
+            name: candidate.name,
+            image: candidate.avatar
+        }];
+        positions = posObj;
+        // console.log("in if z", positions);
+    } else {
+        // console.log("in else 1", positions);
+        /**
+         * check if candidates position exist in positions object if not we create the field
+         *
+         */
+        switch (candidate.position in positions) {
+            case false:
+                positions[candidate.position] = [{
+                    name: candidate.name,
+                    image: candidate.avatar
+                }];
+                break;
+
+            default:
+                positions[candidate.position].push({
+                    name: candidate.name,
+                    image: candidate.avatar
+                });
+                break;
+        }
+        // console.log("in else 2", positions);
+    }
+    //update the positions field of elections document to new positions array
+    return updateElection({ _id: ObjectId(candidate.election_id) }, { $set: { positions: positions } });
 }
 
 module.exports = {
@@ -116,6 +151,7 @@ module.exports = {
             start: new Date(req.body.start),
             end: new Date(req.body.end),
             status: "pending"
+                // positions: {}
         };
         const r = await insertElection(election);
 
@@ -236,7 +272,7 @@ module.exports = {
             if (!errors.isEmpty()) {
                 return res.json({ msg: "Invalid id" });
             }
-            const positions = await getElections({ _id: ObjectId(req.body.id) }, { projection: { positions: 1 } });
+            const positions = await getElections({ _id: ObjectId(req.body.id) }, { projection: { positions: true, _id: true } });
             console.log(positions);
             return res.json(positions);
         }
