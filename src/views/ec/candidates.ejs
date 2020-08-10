@@ -105,31 +105,8 @@
                                         </div>
                                         <!-- candidates -->
                                         <div class="candidates-wrapper">
-                                            <div class="candidates-container">
-                                                <div class="position">
-                                                    <p class="separator">President</p>
-                                                    <div class="candidates">
-                                                        <div class="row">
-                                                            <div class="candidate col-sm-auto">
-                                                                <figure>
-                                                                    <img src="../images/assets/avatar1.jpeg" alt="Elephant at sunset">
-                                                                    <figcaption>An elephant at sunset
-                                                                    </figcaption>
-                                                                </figure>
+                                            <div class="candidates-container position-candidates">
 
-                                                            </div>
-                                                            <div class="candidate col-sm-auto">
-                                                                <figure>
-                                                                    <img src="../images/assets/avatar1.jpeg" alt="Elephant at sunset">
-                                                                    <figcaption>An elephant at sunset
-                                                                    </figcaption>
-                                                                </figure>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <hr class="special">
-                                                </div>
                                             </div>
                                         </div>
 
@@ -161,7 +138,6 @@
                         $.ajax({
                             url: `/ec/candidates?id=${id}`,
                             success: function(res) {
-                                console.log(res);
                                 if (res.msg == "Invalid id") {
                                     $('#messages').append(
                                         `<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -170,13 +146,36 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button></div>`);
                                 } else {
-                                    if (res.length > 0) {
-                                        res.forEach(function(position) {
-                                            let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
-                                        })
+                                    if (typeof res === "object") {
+                                        console.log("res is of type object")
+
+                                        // let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
+                                        $(".position-candidates").html('');
+                                        for (let position in res) {
+                                            $(".position-candidates").append(
+                                                `<div class="position">
+                                                    <p class="separator">${position}</p>
+                                                    <div class="candidates"></div>
+                                                    <div class="row" id="${position}"></div>
+                                                    <hr class="special">
+                                                </div>`
+                                            );
+                                            res[position].forEach(function(candidate) {
+                                                $(`#${position}`).append(
+                                                    `<div class="candidate col-sm-auto">
+                                                        <figure>
+                                                            <img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">
+                                                            <figcaption>${candidate.name}</figcaption>
+                                                        </figure>
+                                                    </div>`);
+                                            });
+                                            console.log(res[position])
+                                        }
+
+
                                     } else {
 
-                                        $(".candidates-wrapper").html(`<div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                        $(".position-candidates").html(`<div class="alert alert-primary alert-dismissible fade show" role="alert">
                                             <p class="h3">No Candidates available. Please add candidates</p>
                                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
@@ -203,7 +202,7 @@
                         stylePanelAspectRatio: 100 / 100,
                         imageResizeTargetWidth: 100,
                         imageResizeTargetHeight: 100,
-                        maxFileSize: '100KB'
+                        maxFileSize: '500KB'
                     })
 
                     FilePond.parse(document.body);

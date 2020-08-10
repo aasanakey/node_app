@@ -193,11 +193,11 @@ i.pass__toggle--visibility {
     background: skyblue;
     margin: 0 auto;
     padding: 1% 5%;
-    border: 1px solid green;
+    // border: 1px solid green;
     .candidates-container {
-      background: orange;
-      padding: 10px;
+      // background: orange;
       text-align: center;
+      min-height: 10em;
     }
     .position {
       .separator {
@@ -207,7 +207,7 @@ i.pass__toggle--visibility {
         float: left;
       }
       .candidate {
-        border: 1px solid red;
+        // border: 1px solid red;
         width: fit-content;
         width: -webkit-fit-content;
         width: -moz-fit-content;
@@ -228,6 +228,10 @@ i.pass__toggle--visibility {
             border-radius: 100%;
             border: 2px solid white;
             width: 10em;
+            height: 10em;
+            &:hover {
+              background: @candidate-hover-bg; //orange;
+            }
           }
         }
       }
@@ -235,7 +239,7 @@ i.pass__toggle--visibility {
       hr.special {
         width: 100%;
         // float: left;
-        color: #ffa200e6;
+        color: #9b978fe6;
       }
     }
   }
