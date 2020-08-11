@@ -1,6 +1,6 @@
 // const passport = require("passport");
 const { Strategy } = require("passport-local");
-const { url, dbName, connection, conOpts, getAdmin } = require("./dbConfig");
+const { getAdmin, getVoter } = require("./dbConfig");
 const { compare } = require("./helpers");
 module.exports = function(passport) {
     // admin local strategy
@@ -43,43 +43,27 @@ module.exports = function(passport) {
                 usernameField: "username",
                 passwordField: "current-password"
             },
-            (username, password, done) => {
-                (async function() {
-                    let client;
-                    try {
-                        /**
-                         * find user with credentials
-                         */
-                        client = await connection.connect(url, conOpts);
-                        const db = client.db(dbName);
-                        const col = db.collection("voters");
-                        const voter = await col.findOne({ username });
-                        if (voter) {
-                            /**
-                             * Validate password by comparing it to the hashed password
-                             */
+            async(username, password, done) => {
+                const voter = await getVoter({ username });
+                if (voter) {
+                    /**
+                     * Validate password by comparing it to the hashed password
+                     */
 
-                            const same = await compare(password, voter.password);
-                            if (same === true) {
-                                // provide admin details
-                                done(null, voter);
-                            } else {
-                                // send error message on password validation failure
-                                done(null, false, {
-                                    message: "Invalid password"
-                                });
-                            }
-                        } else {
-                            //send error message on username validation failure
-                            done(null, false, { message: "Invalid username" });
-                        }
-                    } catch (err) {
-                        console.log(err.stack);
-                        done(null, false, { message: "Invalid username or password" });
-                    } finally {
-                        await client.close();
+                    const same = await compare(password, voter.password);
+                    if (same === true) {
+                        // provide admin details
+                        done(null, voter);
+                    } else {
+                        // send error message on password validation failure
+                        done(null, false, {
+                            message: "Invalid password"
+                        });
                     }
-                })();
+                } else {
+                    //send error message on username validation failure
+                    done(null, false, { message: "Invalid username" });
+                }
             }
         )
     );

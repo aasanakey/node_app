@@ -1,6 +1,6 @@
 const { MongoClient, ObjectId } = require("mongodb");
-const url = "mongodb://localhost:27017";
 const dbName = process.env.DB_NAME;
+const mongo_uri = process.env.MONGO_URL;
 const conOpts = {
     useUnifiedTopology: true
 };
@@ -13,7 +13,7 @@ async function insertElection(election) {
     let client;
 
     try {
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("elections");
         const result = await col.insertOne(election);
@@ -40,7 +40,7 @@ async function updateElection(
 ) {
     let client;
     try {
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("elections");
         const result = await col.findOneAndUpdate(
@@ -63,7 +63,7 @@ async function updateElection(
 async function getElections(query = {}, options = {}) {
     let client;
     try {
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("elections");
         let r = await col.find(query, options).toArray();
@@ -85,7 +85,7 @@ async function insertAdmin(data) {
         /**
          * insert data into database
          */
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("admins");
         const result = await col.insertOne(data);
@@ -108,7 +108,7 @@ async function insertAdmin(data) {
 async function removedAdmin(query) {
     let client;
     try {
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("admins");
         let r = await col.findOneAndDelete(query);
@@ -128,7 +128,7 @@ async function removedAdmin(query) {
 async function getAdmins(query, options) {
     let client;
     try {
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("admins");
         const r = await col.find(query, options).toArray();
@@ -148,10 +148,10 @@ async function getAdmins(query, options) {
 async function getAdmin(query, options) {
     let client;
     try {
-        client = await MongoClient.connect(url, conOpts);
+        client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("admins");
-        const r = await col.findOne(query);
+        const r = await col.findOne(query, options);
         return r;
     } catch (error) {
         console.error(error);
@@ -211,8 +211,26 @@ async function addCandidate(candidate) {
     //update the positions field of elections document to new positions array
     return updateElection({ _id: ObjectId(candidate.election_id) }, { $set: { positions: positions } });
 }
+
+async function getVoter(query, options) {
+    let client;
+    try {
+        /**
+         * find user with credentials
+         */
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("voters");
+        return await col.findOne(query, options);
+    } catch (err) {
+        console.log(err);
+    } finally {
+        await client.close();
+    }
+}
+
 module.exports = {
-    url,
+    mongo_uri,
     dbName,
     MongoClient,
     conOpts,
@@ -223,5 +241,6 @@ module.exports = {
     removedAdmin,
     getAdmins,
     getAdmin,
-    addCandidate
+    addCandidate,
+    getVoter
 };

@@ -3,11 +3,12 @@ const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
 const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const ecRoutes = require("./routes/ecRoutes");
 const voterRoutes = require("./routes/voterRoute");
-
+const { mongo_uri } = require("./utils/dbConfig");
 const port = process.env.APP_PORT || 3000;
 const app = express();
 
@@ -27,8 +28,17 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" })); // for parsing a
 app.use(cookieParser()); // cookie parser
 
 // session middleware to handle sessions
+const store = new MongoDBStore({
+    uri: mongo_uri,
+    collection: "session"
+});
 app.use(
-    session({ secret: "Pax choir-KNUST", resave: false, saveUninitialized: true })
+    session({
+        secret: "Pax choir-KNUST",
+        resave: false,
+        saveUninitialized: true,
+        store: store
+    })
 );
 
 //connect flash to flash messages to session
