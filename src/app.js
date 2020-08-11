@@ -9,7 +9,7 @@ const flash = require("connect-flash");
 const ecRoutes = require("./routes/ecRoutes");
 const voterRoutes = require("./routes/voterRoute");
 const { mongo_uri } = require("./utils/dbConfig");
-const port = process.env.APP_PORT || 3000;
+const port = process.env.PORT || 3000;
 const app = express();
 
 // set views directory and view templating engine to use
@@ -35,6 +35,7 @@ const store = new MongoDBStore({
 });
 app.use(
     session({
+        name: "app.connect.id",
         secret: "Pax choir-KNUST",
         resave: false,
         saveUninitialized: true,
