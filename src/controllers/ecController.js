@@ -212,7 +212,6 @@ module.exports = {
          * if there is handle the query and send response
          */
         if (req.query.id !== undefined) {
-            console.log(req.url, req.query.id);
             /**
              * check if query is valid
              */

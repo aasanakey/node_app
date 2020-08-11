@@ -1,18 +1,16 @@
 const express = require("express");
-// const { dbName, Client } = require("../db");
+const {
+    showAvailableElections,
+    vote
+} = require("../controllers/voterController");
 
 const voterRoutes = express.Router();
 
 voterRoutes.get("/", (req, res) => {
     res.render("voter/index", { title: `Voter | ${process.env.APP_NAME}` });
 });
+voterRoutes.get("/elections", showAvailableElections);
 
-voterRoutes.get("/candidates", (req, res) => {
-    var position = "President";
-    res.render("voter/candidates", {
-        title: `${position} | ${process.env.APP_NAME}`,
-        position
-    });
-});
+voterRoutes.get("/vote", vote);
 
 module.exports = voterRoutes;
