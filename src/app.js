@@ -30,6 +30,7 @@ app.use(cookieParser()); // cookie parser
 // session middleware to handle sessions
 const store = new MongoDBStore({
     uri: mongo_uri,
+    databaseName: process.env.DB_NAME,
     collection: "session"
 });
 app.use(
