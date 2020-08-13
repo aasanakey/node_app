@@ -6,6 +6,25 @@ const {
 } = require("../utils/dbConfig");
 const { validationResult } = require("express-validator");
 const { ObjectID } = require("mongodb");
+
+async function saveData(votes, election_id, positions, voter_id) {
+    for (const position in votes) {
+        //find the index of the selected candidate in the positions array
+        const candidate_index = positions[position].findIndex(candidate => {
+            return candidate.name == votes[position];
+        });
+        // ensure only yes votes are saved
+        if (votes[position] == "No") continue;
+        positions[position][candidate_index].votes += 1;
+    }
+    //write data to database
+    await updateElection({ _id: ObjectID(election_id) }, { $set: { positions: positions }, $inc: { voter_count: 1 } });
+    //update voter status
+    let update = { $set: {} };
+    update.$set[`elections.${election_id}`] = Object.keys(votes);
+    await updateVoter({ _id: ObjectID(voter_id) }, update);
+}
+
 module.exports = {
     async showAvailableElections(req, res) {
         const elections = await getElections({
@@ -81,25 +100,12 @@ module.exports = {
             /**
              * save votes in database
              */
-            for (const position in req.user.votes[req.params.election]) {
-                //find the index of the selected candidate in the positions array
-                const candidate_index = positions[position].findIndex(candidate => {
-                    return (
-                        candidate.name == req.user.votes[req.params.election][position]
-                    );
-                });
-                // ensure only yes votes are saved
-                if (req.user.votes[req.params.election][position] == "No") continue;
-                positions[position][candidate_index].votes += 1;
-            }
-            //write data to database
-            // await updateElection({ _id: ObjectID(req.params.election) }, { $set: { positions: positions }, $inc: { voter_count: 1 } });
-            //update voter status
-            let update = { $set: {} };
-            update.$set[`elections.${req.params.election}`] = Object.keys(
-                req.user.votes[req.params.election]
+            await saveData(
+                req.user.votes[req.params.election], //user votes
+                req.params.election, //election id
+                positions, //election positions
+                req.user._id //voter id
             );
-            await updateVoter({ _id: ObjectID(req.user._id) }, update);
             return res.render("voter/last", {
                 title: `Success | ${process.env.APP_NAME}`,
                 position: "Success",
