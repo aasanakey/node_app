@@ -3,8 +3,8 @@
 
 <head>
     <%- include("../includes/dash/head")-%>
-        <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-        <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+        <!-- <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+        <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet"> -->
 </head>
 
 <body class="sb-nav-fixed ec-dashboard">
@@ -21,7 +21,7 @@
                                             <span>
                                         <button type="button" class="btn btn-primary" data-toggle="modal"
                                             data-target="#exampleModal">
-                                            Add Candidates
+                                            Add Voters
                                         </button>
                                     </span>
                                         </div>
@@ -41,14 +41,14 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <%if(elections){%>
-                                                        <form id="addElectionCandidates" action="/ec/candidates" method="POST">
+                                                        <form id="addElectionCandidates" action="/ec/voters" method="POST">
                                                             <div class="form-row">
                                                                 <div class="input-group mb-3">
                                                                     <div class="input-group-prepend">
                                                                         <label class="input-group-text" for="candidateFormSelectElection">Election</label>
                                                                     </div>
                                                                     <select class="custom-select" id="candidateFormSelectElection" name="election_id">
-                                                            <option value="" selected>Choose...</option>
+                                                            <option value="">Choose...</option>
                                                             <%elections.forEach(function(election){%>
                                                             <option value="<%=election._id%>"><%=election.name%>
                                                             </option>
@@ -58,20 +58,23 @@
                                                             </div>
                                                             <div class="form-row">
                                                                 <div class="form-group col-md-6">
-                                                                    <label for="name">Name</label>
-                                                                    <input type="text" class="form-control" name="name" id="name" autocomplete="name" required aria-required="true">
+                                                                    <label for="username">Username</label>
+                                                                    <input type="text" class="form-control" name="username" id="username" autocomplete="username" required aria-required="true">
                                                                 </div>
                                                                 <div class="form-group col-md-6 ">
-                                                                    <label for="position">Position</label>
-                                                                    <input type="position" class="form-control" name="position" id="position" autocomplete="position" required aria-required="true">
+                                                                    <label for="new-password">Password</label>
+                                                                    <div class="position-relative">
+                                                                        <input type="password" class="form-control" name="new-password" id="new-password" autocomplete="new-password" required aria-required="true">
+                                                                        <i class="pass__toggle--visibility fas fa-eye" title="Show password" role="button"></i>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="form-row">
+                                                            <!-- <div class="form-row">
                                                                 <div class="col-md-12">
                                                                     <label for="avatar">Picture</label>
                                                                     <input type="file" name="avatar" id="avatar" class="filepond">
                                                                 </div>
-                                                            </div>
+                                                            </div> -->
                                                         </form>
                                                         <%}else{%>
                                                             <div class="">
@@ -104,10 +107,22 @@
                                                 </select>
                                         </div>
                                         <!-- candidates -->
-                                        <div class="candidates-wrapper">
-                                            <div class="candidates-container position-candidates">
-                                                <p class="h4">Select an election to view candidates</p>
-                                            </div>
+                                        <div class="text-center">
+                                            <p class="h4">Select an election to view Voters</p>
+                                            <caption>
+                                                <p class="h3">Voters</p>
+                                            </caption>
+                                            <table id="voters" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <th>Name</th>
+                                                    <th>Action</th>
+                                                </thead>
+                                                <tbody></tbody>
+                                                <tfoot>
+                                                    <th>Name</th>
+                                                    <th>Action</th>
+                                                </tfoot>
+                                            </table>
                                         </div>
 
                                         <%}else{%>
@@ -124,20 +139,21 @@
         </div>
         <%- include('../includes/dash/scripts') -%>
             <!-- filepond dependencies for fileupload -->
-            <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+            <!-- <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
             <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
             <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
             <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
             <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
-            <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+            <script src="https://unpkg.com/filepond/dist/filepond.js"></script> -->
             <script>
                 $(document).ready(function() {
                     $("#inputGroupSelectElection").on("change", function(e) {
                         let id = e.target.value;
-                        console.log(id);
+
                         $.ajax({
-                            url: `/ec/candidates?id=${id}`,
+                            url: `/ec/voters?id=${id}`,
                             success: function(res) {
+                                console.log(res, res.length)
                                 if (res.msg == "Invalid id") {
                                     $('#messages').append(
                                         `<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -146,39 +162,15 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button></div>`);
                                 } else {
-                                    if (typeof res === "object") {
-                                        console.log("res is of type object")
-
-                                        // let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
-                                        $(".position-candidates").html('');
-                                        for (let position in res) {
-                                            $(".position-candidates").append(
-                                                `<div class="position">
-                                                    <p class="separator">${position}</p>                                            
-                                                    <div class="row" id="${position.replace(" ", "_")}"></div>
-                                                    <hr class="special">
-                                                </div>`
-                                            );
-                                            res[position].forEach(function(candidate) {
-                                                $(`#${position.replace(" ", "_")}`).append(
-                                                    `<div class="candidate col-sm-auto">
-                                                        <figure>
-                                                            <img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">
-                                                            <figcaption>${candidate.name}</figcaption>
-                                                        </figure>
-                                                    </div>`);
+                                    if (res instanceof Array) {
+                                        $("#voters tbody").html('');
+                                        if (res.length > 0) {
+                                            res.forEach(function(voter) {
+                                                $("#voters tbody").append(`<tr><td>${voter.username}</td><td>Action</td></tr>`);
                                             });
-                                            console.log(res[position])
+                                        } else {
+                                            $("#voters tbody").html(`<tr class="odd"><td valign="top" colspan="2" class="dataTables_empty">No data available in table</td></tr>`)
                                         }
-
-
-                                    } else {
-
-                                        $(".position-candidates").html(`<div class="alert alert-primary alert-dismissible fade show" role="alert">
-                                            <p class="h3">No Candidates available. Please add candidates</p>
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button></div>`);
                                     }
                                 }
                             },
@@ -187,24 +179,24 @@
                             }
                         })
                     })
-
+                    var table = $('#voters').DataTable();
                     // filepond setup
-                    FilePond.registerPlugin(
-                        FilePondPluginImagePreview,
-                        FilePondPluginFileValidateSize,
-                        FilePondPluginImageResize,
-                        FilePondPluginImageTransform,
-                        FilePondPluginFileEncode,
-                    )
+                    // FilePond.registerPlugin(
+                    //     FilePondPluginImagePreview,
+                    //     FilePondPluginFileValidateSize,
+                    //     FilePondPluginImageResize,
+                    //     FilePondPluginImageTransform,
+                    //     FilePondPluginFileEncode,
+                    // )
 
-                    FilePond.setOptions({
-                        stylePanelAspectRatio: 100 / 100,
-                        imageResizeTargetWidth: 100,
-                        imageResizeTargetHeight: 100,
-                        maxFileSize: '500KB'
-                    })
+                    // FilePond.setOptions({
+                    //     stylePanelAspectRatio: 100 / 100,
+                    //     imageResizeTargetWidth: 100,
+                    //     imageResizeTargetHeight: 100,
+                    //     maxFileSize: '500KB'
+                    // })
 
-                    FilePond.parse(document.body);
+                    // FilePond.parse(document.body);
                 })
             </script>
 </body>

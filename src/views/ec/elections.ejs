@@ -210,7 +210,7 @@
                     table.on('click', '.start-btn', function(e) {
                         var tr = $(e.target).closest('tr');
                         var data = table.row(tr).data();
-                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                        if (confirm("Are you shure you want to start this election")) {
                             $.ajax({
                                 url: '/ec/elections/start',
                                 method: 'PATCH',
@@ -251,7 +251,7 @@
                     table.on('click', '.end-btn', function(e) {
                         var tr = $(e.target).closest('tr');
                         var data = table.row(tr).data();
-                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                        if (confirm("Are you shure you want to end this election")) {
                             $.ajax({
                                 url: '/ec/elections/end',
                                 method: 'PATCH',

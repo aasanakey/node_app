@@ -6,10 +6,13 @@ const {
     insertElection,
     updateElection,
     getElections,
+    findElection,
     insertAdmin,
     removedAdmin,
     getAdmins,
-    addCandidate
+    addCandidate,
+    getelectionVoters,
+    addVoters
 } = require("../utils/dbConfig");
 const { ObjectId } = require("mongodb");
 const { hash, extractFilePondEncodedImage } = require("../utils/helpers");
@@ -18,6 +21,7 @@ const { validationResult } = require("express-validator");
 module.exports = {
     logout(req, res) {
         req.logout(req.user);
+        req.session = null;
         res.redirect("/ec");
     },
     /**
@@ -98,7 +102,8 @@ module.exports = {
             name: req.body.name,
             start: new Date(req.body.start),
             end: new Date(req.body.end),
-            status: "pending"
+            status: "pending",
+            voter_count: 0
                 // positions: {}
         };
         const r = await insertElection(election);
@@ -219,8 +224,9 @@ module.exports = {
             if (!errors.isEmpty()) {
                 return res.json({ msg: "Invalid id" });
             }
-            let positions = await getElections({ _id: ObjectId(req.query.id) }, { projection: { positions: true, _id: true } });
-            positions = positions[0].positions;
+            let positions = await findElection({ _id: ObjectId(req.query.id) }, { projection: { positions: true } });
+            positions = positions.positions;
+            console.log(positions);
             if (positions === undefined) return res.json("error");
             return res.json(positions);
         }
@@ -245,5 +251,64 @@ module.exports = {
             req.flash("errors", "Failed to add candidate");
         }
         res.redirect("back");
+    },
+
+    async showElectionVoters(req, res) {
+        const elections = await getElections({}, {
+            projection: {
+                name: true,
+                start: true
+            }
+        });
+        if (req.query.id !== undefined) {
+            /**
+             * check if query is valid
+             */
+            let errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.json({ msg: "Invalid id" });
+            }
+            const election = await findElection({ _id: ObjectId(req.query.id) }, { projection: { _id: true } });
+            if (election._id != req.query.id) return res.json({ msg: "Invalid id" });
+            let query = {};
+            query[`elections.${req.query.id}`] = { $exists: true };
+            const voters = await getelectionVoters(query, {
+                projection: { password: false }
+            });
+            return res.json(voters);
+        }
+        res.render("ec/voters", {
+            title: `EC - Voters | ${process.env.APP_NAME}`,
+            elections
+        });
+    },
+    async addElectionVoters(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors.array());
+            // const input = [req.body.election_id,req.body.username]
+            req.flash("val_errors", errors.array());
+            return res.redirect("back");
+        }
+
+        /**
+         * Add voter object and add to collection
+         */
+        let data = {
+            username: req.body.username,
+            password: req.body["new-password"],
+            elections: {}
+        };
+        data.password = await hash(data.password); //hash plain text password
+        data.elections[req.body.election_id] = [];
+        const result = await addVoters([data]);
+        //flash appropriate message to session
+        if (result.insertedCount > 0) {
+            req.flash("success", "Voter added succesfully");
+            return res.redirect("back");
+        } else {
+            req.flash("errors", "Failed to add voter");
+            return res.redirect("back");
+        }
     }
 };

@@ -10,37 +10,105 @@
     <title>
         <%=title%>
     </title>
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../../../../css/styles.css">
 </head>
 
 <body class="vapp">
     <%- include('../includes/header')-%>
         <main class="mt-5">
             <div class="container-fluid">
+                <div class="container auth-msg">
+                    <%- include('../includes/messages') -%>
+                </div>
                 <p class="text-center">Please Click on the box below the candidate of your choice to cast your vote</p>
                 <div class="candidates">
                     <div class="row">
-                        <div class="candidate col-sm-auto">
-                            <figure>
-                                <img src="../images/assets/avatar1.jpeg" alt="Elephant at sunset">
-                                <figcaption>An elephant at sunset</figcaption>
-                            </figure>
-                            <input type="radio" name="<%=position%>" value="candidate1">
-                        </div>
-                        <div class="candidate col-sm-auto">
-                            <figure>
-                                <img src="../images/assets/avatar1.jpeg" alt="Elephant at sunset">
-                                <figcaption>An elephant at sunset</figcaption>
-                            </figure>
-                            <input type="radio" name="<%=position%>" value="candidate1">
-                        </div>
+                        <%if(candidates){ %>
+                            <%if(candidates.length == 1){ %>
+                                <div class="candidate col-sm-auto">
+                                    <figure>
+                                        <img src="data:<%=candidates[0].image.type%>;charset=utf-8;base64,<%=candidates[0].image.data.toString('base64')%>" alt="<%=candidates[0].name%>">
+                                        <figcaption>
+                                            <%=candidates[0].name%>
+                                        </figcaption>
+                                    </figure>
+                                    <div class="form-group row">
+                                        <div class="col-auto">
+                                            <label for="yes">Yes</label>
+                                            <input type="radio" id="yes" name="<%=position%>" value="<%=candidates[0].name%>">
+                                        </div>
+                                        <div class="col-auto">
+                                            <label for="no">No</label>
+                                            <input type="radio" id="no" name="<%=position%>" value="No">
+                                        </div>
+                                    </div>
+                                </div>
+                                <%}else{%>
+                                    <%candidates.forEach(function(candidate){%>
+                                        <div class="candidate col-sm-auto">
+                                            <figure>
+                                                <img src="data:<%=candidate.image.type%>;charset=utf-8;base64,<%=candidate.image.data.toString('base64')%>" alt="<%=candidate.name%>">
+                                                <figcaption>
+                                                    <%=candidate.name%>
+                                                </figcaption>
+                                            </figure>
+                                            <input type="radio" name="<%=position%>" value="<%=candidate.name%>">
+                                        </div>
+                                        <%})%>
+                                            <%}%>
+                                                <%}%>
                     </div>
-                    <button type="button" class="btn btn__continue">Next</button>
+                    <a href="/voter/vote/<%=election%>/<%=next%>" id="next" class="btn btn__continue">Next</a>
                 </div>
-
-            </div>
         </main>
         <%- include('../includes/footer') -%>
+            <script src="../../../../js/app.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $("#next").on("click", function(event) {
+                        event.preventDefault();
+                        let input = document.querySelector("input[type=radio]:checked");
+                        if (!input) {
+                            $('#messages').append(
+                                `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    Please cast your vote
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span></button></div>`);
+                            return false;
+                        }
+                        let href = $(this).attr("href")
+                        $.ajax({
+                            method: "POST",
+                            url: "/voter/vote/<%=election%>/<%=position%>",
+                            data: {
+                                election: "<%=election%>",
+                                position: "<%=position%>",
+                                choice: input.value
+                            },
+                            success: function(res) {
+                                console.log(res);
+                                if (res instanceof Array) {
+                                    res.forEach(function(value) {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            ${value.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    });
+                                }
+                                if (res.msg == "Ok") {
+                                    //console.log(href)
+                                    window.location.href = href;
+                                }
+                            },
+                            error: function(error) {
+                                console.log(error);
+                            },
+                        })
+                    });
+                });
+            </script>
 </body>
 
 </html>

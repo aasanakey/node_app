@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>
+        <%=title%>
+    </title>
+    <link rel="stylesheet" href="../../../../css/styles.css">
+</head>
+
+<body class="vapp">
+    <%- include('../includes/header')-%>
+        <main class="mt-5">
+            <div class="container-fluid">
+                <div class="container auth-msg">
+                    <%- include('../includes/messages') -%>
+                </div>
+                <p class="text-center h5">Thank You! Vote Successfully Cast.</p>
+                <div class="candidates">
+                    <%if(candidates){ %>
+                        <%Object.keys(candidates).forEach(function(position){%>
+                            <div class="position">
+                                <p class="separator text-center">
+                                    <%=position%>
+                                </p>
+                                <div class="candidates">
+                                    <div class="row" id="president">
+                                        <%candidates[position].forEach(function(candidate){%>
+                                            <!-- <div class="row" id="president"> -->
+                                            <div class="candidate col-sm-auto">
+                                                <figure>
+                                                    <img src="data:<%=candidate.image.type%>;charset=utf-8;base64,<%=candidate.image.data.toString('base64')%>" alt="<%=candidate.name%>">
+                                                    <figcaption>
+                                                        <%=candidate.name%>
+                                                    </figcaption>
+                                                </figure>
+                                            </div>
+                                            <%})%>
+                                    </div>
+                                </div>
+                                <div class="vote">
+                                    <p class="h5 text-white">Choice:
+                                        <%=votes[position]%>
+                                    </p>
+                                </div>
+                                <hr class="special">
+                            </div>
+                            <%})%>
+                                <%} %>
+                                    <a href="<%=next%>" class="btn btn__continue">End Session</a>
+                </div>
+        </main>
+        <%- include('../includes/footer') -%>
+            <script src=" ../../../../js/app.js">
+            </script>
+</body>
+
+</html>

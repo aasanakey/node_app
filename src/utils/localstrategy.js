@@ -21,7 +21,10 @@ module.exports = function(passport) {
                     const same = await compare(password, admin.password);
                     if (same === true) {
                         // provide admin details
-                        done(null, admin);
+                        done(null, {
+                            username: admin.usermame,
+                            _id: admin._id
+                        });
                     } else {
                         // send error message on password validation failure
                         done(null, false, {
@@ -53,7 +56,11 @@ module.exports = function(passport) {
                     const same = await compare(password, voter.password);
                     if (same === true) {
                         // provide admin details
-                        done(null, voter);
+                        done(null, {
+                            _id: voter._id,
+                            username: voter.username,
+                            elections: voter.elections
+                        });
                     } else {
                         // send error message on password validation failure
                         done(null, false, {

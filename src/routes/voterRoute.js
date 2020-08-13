@@ -3,8 +3,11 @@ const passport = require("passport");
 const { ensureVoterIsAuthenticated } = require("../utils/auth");
 const {
     showAvailableElections,
-    vote
+    vote,
+    saveVote,
+    logout
 } = require("../controllers/voterController");
+const { param, check } = require("express-validator");
 
 const voterRoutes = express.Router();
 
@@ -14,12 +17,12 @@ voterRoutes
         res.render("voter/index", { title: `Voter | ${process.env.APP_NAME}` });
     })
     .post((req, res, next) => {
-        // passport.authenticate("voter-signup", {
-        //     successRedirect: "/voter/elections",
-        //     failureRedirect: "/voter",
-        //     failureFlash: true
-        // })(req, res, next);
-        res.redirect("/voter/elections");
+        passport.authenticate("voter-signup", {
+            successRedirect: "/voter/elections",
+            failureRedirect: "/voter",
+            failureFlash: true
+        })(req, res, next);
+        // res.redirect("/voter/elections");
     });
 voterRoutes
     .route("/elections")
@@ -27,8 +30,49 @@ voterRoutes
     .get(showAvailableElections);
 
 voterRoutes
-    .route("/vote")
+    .route("/vote/:election/:position")
     .all(ensureVoterIsAuthenticated)
-    .get(vote);
+    .get(
+        [
+            param("election")
+            .not()
+            .notEmpty()
+            .withMessage("Election id is required")
+            .bail()
+            .isMongoId()
+            .withMessage("Invalid election")
+            .bail(),
+            param("position")
+            .not()
+            .notEmpty()
+            .withMessage("Position is required")
+            .bail()
+        ],
+        vote
+    )
+    .post(
+        [
+            check("election")
+            .not()
+            .notEmpty()
+            .withMessage("Election id is required")
+            .bail()
+            .isMongoId()
+            .withMessage("Invalid election")
+            .bail(),
+            check("position")
+            .not()
+            .notEmpty()
+            .withMessage("Position is required"),
+            check("choice")
+            .not()
+            .notEmpty()
+            .withMessage("Vote is required")
+            .bail()
+        ],
+        saveVote
+    );
+
+voterRoutes.route("/logout").get(logout);
 
 module.exports = voterRoutes;

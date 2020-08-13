@@ -13,8 +13,11 @@ const {
     startElection,
     endElection,
     showElectionCandidates,
-    addElectionCandidate
+    addElectionCandidate,
+    showElectionVoters,
+    addElectionVoters
 } = require("../controllers/ecController");
+const { getelectionVoters } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
 ecRoutes
     .route("/")
@@ -132,6 +135,45 @@ ecRoutes
         addAdmin
     )
     .delete([check("id").isMongoId()], deleteAdmin);
+
+ecRoutes
+    .route("/voters")
+    .get([query("id").isMongoId()], showElectionVoters)
+    .post(
+        [
+            check("election_id")
+            .not()
+            .notEmpty()
+            .withMessage("Election field is required")
+            .bail(),
+            check("username")
+            .not()
+            .notEmpty()
+            .withMessage("Username is required")
+            .custom(async(value, { req }) => {
+                let query = {};
+                query[`elections.${req.body.election_id}`] = { $exists: true };
+                const registeredVoters = await getelectionVoters(query);
+                registeredVoters.forEach(voter => {
+                    if (
+                        voter.elections.hasOwnProperty(req.body.election_id) &&
+                        voter.username == value
+                    ) {
+                        throw new Error(
+                            "Voter has already been registered for this elections"
+                        );
+                    } else {
+                        return value;
+                    }
+                });
+            }),
+            check("new-password")
+            .not()
+            .notEmpty()
+            .withMessage("Password is required")
+        ],
+        addElectionVoters
+    );
 
 /**
  * Handle all requests to /ec/logout route

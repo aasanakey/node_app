@@ -39,7 +39,8 @@ app.use(
         secret: "Pax choir-KNUST",
         resave: false,
         saveUninitialized: true,
-        store: store
+        store: store,
+        unset: "destroy"
     })
 );
 

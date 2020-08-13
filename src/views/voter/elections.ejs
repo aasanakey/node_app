@@ -18,9 +18,12 @@
         <main class="mt-5">
             <div class="container-fluid">
                 <p class="text-center">Please select election to start voting</p>
+                <div class="container auth-msg">
+                    <%- include('../includes/messages') -%>
+                </div>
                 <div class="list-group">
                     <%elections.forEach(function(election){%>
-                        <a href="/voter/vote?election=<%=election._id%>position=null" class="list-group-item list-group-item-action">
+                        <a href="/voter/vote/<%=election._id%>/first" class="list-group-item list-group-item-action">
                             <%=election.name%>
                                 Elections</a>
                         <%})%>
@@ -28,6 +31,7 @@
             </div>
         </main>
         <%- include('../includes/footer') -%>
+            <script src="../js/app.js"></script>
 </body>
 
 </html>

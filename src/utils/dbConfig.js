@@ -10,14 +10,14 @@ const conOpts = {
  * Insert one document into elections collection
  * @param {*} election
  */
-async function insertElection(election) {
+async function insertElection(doc, options) {
     let client;
 
     try {
         client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("elections");
-        const result = await col.insertOne(election);
+        const result = await col.insertOne(doc, options);
         return {
             count: result.insertedCount,
             id: result.insertedId
@@ -68,6 +68,26 @@ async function getElections(query = {}, options = {}) {
         const db = client.db(dbName);
         const col = db.collection("elections");
         let r = await col.find(query, options).toArray();
+        return r;
+    } catch (error) {
+        console.log(error);
+    } finally {
+        await client.close();
+    }
+}
+
+/**
+ * Fetch election from database
+ * @param {*} query
+ * @param {*} projection
+ */
+async function findElection(query = {}, options = {}) {
+    let client;
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("elections");
+        let r = await col.findOne(query, options);
         return r;
     } catch (error) {
         console.log(error);
@@ -165,10 +185,7 @@ async function addCandidate(candidate) {
     //exit if candidate object does'nt have the required properties
     if (!candidate.election_id && !candidate.position) return false;
     // obtain the elections document from the database
-    const result = await getElections({
-        _id: ObjectId(candidate.election_id)
-    });
-    const election = result.length === 1 ? result[0] : null;
+    const election = await findElection({ _id: ObjectId(candidate.election_id) });
     if (election === null) return false;
     let positions = election.positions;
     /**
@@ -182,7 +199,8 @@ async function addCandidate(candidate) {
         let posObj = {};
         posObj[candidate.position] = [{
             name: candidate.name,
-            image: candidate.avatar
+            image: candidate.avatar,
+            votes: 0
         }];
         positions = posObj;
         // console.log("in if z", positions);
@@ -196,14 +214,16 @@ async function addCandidate(candidate) {
             case false:
                 positions[candidate.position] = [{
                     name: candidate.name,
-                    image: candidate.avatar
+                    image: candidate.avatar,
+                    votes: 0
                 }];
                 break;
 
             default:
                 positions[candidate.position].push({
                     name: candidate.name,
-                    image: candidate.avatar
+                    image: candidate.avatar,
+                    votes: 0
                 });
                 break;
         }
@@ -230,6 +250,59 @@ async function getVoter(query, options) {
     }
 }
 
+async function getelectionVoters(query, options) {
+    let client;
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("voters");
+        const r = await col.find(query, options).toArray();
+        return r;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        client.close();
+    }
+}
+
+async function updateVoter(filterQuery = {}, updateQuery = {}, options = {}) {
+    let client;
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("voters");
+        const result = await col.findOneAndUpdate(
+            filterQuery,
+            updateQuery,
+            options
+        );
+        return result.value;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
+
+async function addVoters(doc = [], options = {}) {
+    let client;
+
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("voters");
+        const result = await col.insertMany(doc, options);
+        return {
+            insertedCount: result.insertedCount,
+            insertedIds: result.insertedIds
+        };
+    } catch (error) {
+        console.log(error);
+    } finally {
+        client.close();
+    }
+}
+
 module.exports = {
     mongo_uri,
     dbName,
@@ -238,10 +311,14 @@ module.exports = {
     insertElection,
     updateElection,
     getElections,
+    findElection,
     insertAdmin,
     removedAdmin,
     getAdmins,
     getAdmin,
     addCandidate,
-    getVoter
+    getVoter,
+    getelectionVoters,
+    addVoters,
+    updateVoter
 };
