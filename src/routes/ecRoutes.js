@@ -1,7 +1,7 @@
 const express = require("express");
 const passport = require("passport");
 const { ensureAdminIsAuthenticated } = require("../utils/auth");
-const { check, query } = require("express-validator");
+const { check, query, param } = require("express-validator");
 const {
     logout,
     showAdmins,
@@ -15,7 +15,8 @@ const {
     showElectionCandidates,
     addElectionCandidate,
     showElectionVoters,
-    addElectionVoters
+    addElectionVoters,
+    showElectionResults
 } = require("../controllers/ecController");
 const { getelectionVoters } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
@@ -175,6 +176,7 @@ ecRoutes
         addElectionVoters
     );
 
+ecRoutes.route("/:id").get([param("id").isMongoId()], showElectionResults);
 /**
  * Handle all requests to /ec/logout route
  */

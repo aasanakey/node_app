@@ -22,6 +22,24 @@
   margin-top: auto;
 }
 
+.sky-blue-bg() {
+  width: 80%;
+  max-height: fit-content;
+  max-height: -webkit-fit-content;
+  max-height: -moz-fit-content;
+  background: skyblue;
+  margin: 0 auto;
+  padding: 1% 5%;
+}
+
+.figure() {
+  width: fit-content;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 //imports
 @import "bootstrap/dist/css/bootstrap.css";
 @import "@fortawesome/fontawesome-free/less/fontawesome.less";
@@ -119,17 +137,9 @@ i.pass__toggle--visibility {
   }
 
   .candidates {
-    width: 80%;
-    max-height: fit-content;
-    max-height: -webkit-fit-content;
-    max-height: -moz-fit-content;
+    .sky-blue-bg();
 
-    background: skyblue;
-    margin: 0 auto;
-    padding: 1% 5%;
-    // border: 1px solid green;
     .candidate {
-      // border: 1px solid red;
       width: fit-content;
       width: -webkit-fit-content;
       width: -moz-fit-content;
@@ -154,12 +164,7 @@ i.pass__toggle--visibility {
     }
 
     figure {
-      width: fit-content;
-      width: -webkit-fit-content;
-      width: -moz-fit-content;
-      margin-right: auto;
-      margin-left: auto;
-
+      .figure();
       img {
         padding: 0.3em;
         border-radius: 100%;
@@ -205,12 +210,9 @@ i.pass__toggle--visibility {
       min-height: 10em;
     }
     .position {
-      .separator {
-        font-size: 13pt;
-        font-weight: bold;
-        width: 100%;
-        float: left;
-      }
+      // .separator {
+      //   .separator()
+      // }
       .candidate {
         // border: 1px solid red;
         width: fit-content;
@@ -222,11 +224,7 @@ i.pass__toggle--visibility {
         text-align: center !important;
 
         figure {
-          width: fit-content;
-          width: -webkit-fit-content;
-          width: -moz-fit-content;
-          margin-right: auto;
-          margin-left: auto;
+          .figure();
 
           img {
             padding: 0.3em;
@@ -245,6 +243,27 @@ i.pass__toggle--visibility {
         width: 100%;
         // float: left;
         color: #9b978fe6;
+      }
+    }
+  }
+  .election-results {
+    .sky-blue-bg();
+    text-align: center;
+    .candidate {
+      width: fit-content;
+      width: -webkit-fit-content;
+      width: -moz-fit-content;
+      margin-right: auto;
+      margin-left: auto;
+      figure {
+        .figure();
+        img {
+          padding: 0.3em;
+          border-radius: 100%;
+          border: 2px solid white;
+          width: 10em;
+          height: 10em;
+        }
       }
     }
   }

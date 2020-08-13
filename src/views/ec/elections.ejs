@@ -120,12 +120,14 @@
                                                 </td>
                                                 <td>
                                                     <%if(election.status === "pending"){%>
-                                                        <button type="button" class="btn btn-small btn-primary start-btn">start</button>
+                                                        <button type="button" class="btn btn-small btn-primary start-btn">Start</button>
                                                         <%}else if(election.status === "active"){%>
-                                                            <button type="button" class="btn btn-small btn-primary end-btn">end</button>
+                                                            <button type="button" class="btn btn-small btn-primary end-btn">End</button>
                                                             <%}%>
-                                                                <button type="button" title="Delete" class="btn btn-small btn-primary mt-3 delete-btn"><i
-                                                class="fas fa-trash-alt"></i></button>
+                                                                <%if(election.status === "active" || election.status ==="ended"){%>
+                                                                    <a href="/ec/<%=election._id%>" class="btn btn-small mt-3 btn-primary">Results</a>
+                                                                    <%}%>
+                                                                        <button type="button" title="Delete" class="btn btn-small btn-primary mt-3 delete-btn">Delete</button>
 
                                                 </td>
                                             </tr>

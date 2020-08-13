@@ -310,5 +310,23 @@ module.exports = {
             req.flash("errors", "Failed to add voter");
             return res.redirect("back");
         }
+    },
+
+    async showElectionResults(req, res) {
+        const election = await findElection({ _id: ObjectId(req.params.id) });
+        //compute total votes for each positon
+        // const total_votes = {};
+        // Object.keys(election.positions).forEach(position => {
+        //     total_votes[position] = 0;
+        //     election.positions[position].forEach(candidate => {
+        //         total_votes[position] += candidate.votes;
+        //     });
+        // });
+        // console.log(total_votes);
+        res.render("ec/election_result", {
+            title: `EC - Results | ${process.env.APP_NAME}`,
+            election
+            // total_votes
+        });
     }
 };
