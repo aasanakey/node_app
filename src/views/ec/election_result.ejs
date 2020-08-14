@@ -3,6 +3,20 @@
 
 <head>
     <%- include("../includes/dash/head")-%>
+        <style>
+            @media print {
+                footer,
+                .btn-print {
+                    display: none;
+                }
+                .election-results {
+                    position: fixed;
+                    top: 0 !important;
+                    margin: 0 !important;
+                    width: 99.9% !important;
+                }
+            }
+        </style>
 </head>
 
 <body class="sb-nav-fixed ec-dashboard">
@@ -14,8 +28,12 @@
                         <div class="container-fluid">
                             <!-- page content goes here -->
                             <%if(election){%>
-                                <div class="election-results mt-5">
-                                    <p class="h2 text-center">Election Result</p>
+                                <div class="election-results mt-5 mb-5">
+                                    <div class="header">
+                                        <p class="h2 text-center">Election Result</p>
+                                        <button class="btn btn-primary btn-small btn-print" onclick="window.print();">Print</button>
+                                    </div>
+                                    <hr class="special">
                                     <%Object.keys(election.positions).forEach(function(position){%>
                                         <div class="position">
                                             <p class="h4 text-center">
