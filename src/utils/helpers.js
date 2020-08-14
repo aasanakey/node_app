@@ -23,11 +23,11 @@ module.exports = {
         // } catch (error) {
         //     console.log(error);
         // }
+    },
+    base64FileToBuffer(base64) {
+        const fileData = JSON.parse(base64);
+        if (fileData == null) throw new Error("File is corrupted");
+        const buf = new Buffer.from(fileData.data, "base64");
+        return buf;
     }
 };
-
-/**
-//if (this.coverImage != null && this.coverImageType != null) {
-//   return `data:${this.coverImageType};charset=utf-8;base64,${this.coverImage.toString("base64")}`;
-// }
-**/

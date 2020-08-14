@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const express = require("express");
 const passport = require("passport");
 const { ensureAdminIsAuthenticated } = require("../utils/auth");
@@ -17,7 +18,8 @@ const {
     addElectionCandidate,
     showElectionVoters,
     addElectionVoters,
-    showElectionResults
+    showElectionResults,
+    importVotersFromELXS
 } = require("../controllers/ecController");
 const { getelectionVoters, findElection } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
@@ -61,7 +63,8 @@ ecRoutes
             .withMessage("Candidate's picture is required")
         ],
         addElectionCandidate
-    );
+    )
+    .delete();
 
 /**
  * Handle all requests to /ec/elections route
@@ -189,11 +192,32 @@ ecRoutes
         addElectionVoters
     );
 
-ecRoutes.route("/:id").get([param("id").isMongoId()], showElectionResults);
+ecRoutes.route("/voters/import").post(
+    [
+        check("election_id")
+        .not()
+        .notEmpty()
+        .withMessage("Election field is required")
+        .bail(),
+        check("file")
+        .not()
+        .notEmpty()
+        .withMessage("Upload an excel file")
+    ],
+    importVotersFromELXS
+);
+
 /**
  * Handle all requests to /ec/logout route
  */
 ecRoutes.route("/logout").get(logout);
+
+/**
+ * must be the last handler for /ec/* to prevent error be throw by express validator (Invalid MongoID)
+ */
+ecRoutes
+    .route("/result/:id")
+    .get([param("id").isMongoId()], showElectionResults);
 
 // export router;
 module.exports = ecRoutes;

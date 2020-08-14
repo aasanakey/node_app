@@ -15,8 +15,14 @@ const {
     addVoters
 } = require("../utils/dbConfig");
 const { ObjectId } = require("mongodb");
-const { hash, extractFilePondEncodedImage } = require("../utils/helpers");
+const {
+    hash,
+    extractFilePondEncodedImage,
+    base64FileToBuffer
+} = require("../utils/helpers");
 const { validationResult } = require("express-validator");
+
+const xlsx = require("xlsx");
 
 module.exports = {
     logout(req, res) {
@@ -332,5 +338,43 @@ module.exports = {
             election
             // total_votes
         });
+    },
+    async importVotersFromELXS(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors.array());
+            req.flash("val_errors", errors.array());
+            return res.redirect("back");
+        }
+        const buf = base64FileToBuffer(req.body.file);
+        const workbook = xlsx.read(buf, { type: "buffer" });
+        let voters = [];
+        /**
+         * loop through all the woorksheets in the excel workbook
+         */
+        workbook.SheetNames.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            const data = xlsx.utils.sheet_to_json(worksheet);
+            /**
+             * add election id to each user,hash password and
+             */
+            voters = data.map(voter => {
+                let elections = {};
+                elections[req.body.election_id] = [];
+                voter["elections"] = elections;
+                hash(voter.password).then(password => (voter.password = password));
+                return voter;
+            });
+        });
+
+        const result = await addVoters(voters);
+        //flash appropriate message to session
+        if (result.insertedCount > 0) {
+            req.flash("success", "Voters added succesfully");
+            return res.redirect("back");
+        } else {
+            req.flash("errors", "Failed to add voters");
+            return res.redirect("back");
+        }
     }
 };

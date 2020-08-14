@@ -15,6 +15,13 @@ const port = process.env.PORT || 3000;
 const app = express();
 // make the moment package glabally avialable within express
 app.locals.moment = moment;
+//global function to dynamically load resource path in views
+app.locals.assets = url => {
+    const root_path = process.env.ASSETS_URL || process.env.APP_URL;
+
+    return root_path.concat(url);
+};
+
 // set views directory and view templating engine to use
 app.set("views", "./src/views");
 app.set("view engine", "ejs");
