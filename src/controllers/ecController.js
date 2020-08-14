@@ -177,7 +177,7 @@ module.exports = {
         if (!errors.isEmpty()) {
             console.log(errors.array());
             // req.flash("val_errors", errors.array());
-            return res.json({ msg: "Invalid id" });
+            return res.json(errors.array());
         }
         const result = await updateElection({ _id: ObjectId(req.body.id) }, { $set: { status: req.body.status } });
         if (result._id) {
@@ -314,6 +314,10 @@ module.exports = {
 
     async showElectionResults(req, res) {
         const election = await findElection({ _id: ObjectId(req.params.id) });
+        if (!election.positions) {
+            req.flash("errors", "Election has no candidates");
+            return res.redirect("back");
+        }
         //compute total votes for each positon
         // const total_votes = {};
         // Object.keys(election.positions).forEach(position => {

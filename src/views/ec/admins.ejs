@@ -65,15 +65,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="container mt-5 text-center">
-                                <caption>
-                                    <p class="h3">Admins</p>
-                                </caption>
+                            <div class="table-responsive mt-5 text-center">
+
                                 <table id="admins" class="table table-striped table-bordered">
+                                    <caption>
+                                        <p class="h3">Admins</p>
+                                    </caption>
                                     <thead>
-                                        <th hidden>ID</th>
-                                        <th>Admin</th>
-                                        <th>Action</th>
+                                        <tr>
+                                            <th hidden>ID</th>
+                                            <th>Admin</th>
+                                            <th>Action</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         <%admins.forEach(admin=>{%>

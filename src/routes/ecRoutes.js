@@ -2,6 +2,7 @@ const express = require("express");
 const passport = require("passport");
 const { ensureAdminIsAuthenticated } = require("../utils/auth");
 const { check, query, param } = require("express-validator");
+const { ObjectID } = require("mongodb");
 const {
     logout,
     showAdmins,
@@ -18,7 +19,7 @@ const {
     addElectionVoters,
     showElectionResults
 } = require("../controllers/ecController");
-const { getelectionVoters } = require("../utils/dbConfig");
+const { getelectionVoters, findElection } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
 ecRoutes
     .route("/")
@@ -74,10 +75,10 @@ ecRoutes
             check("name")
             .not()
             .isEmpty()
-            .withMessage("Election period is required")
+            .withMessage("Election name is required")
             .bail()
             .isString()
-            .withMessage("Election period must be a string"),
+            .withMessage("Election name must be a string"),
             check("start")
             .not()
             .isEmpty()
@@ -110,9 +111,21 @@ ecRoutes
         createElection
     )
     .delete([check("id").isMongoId()], deleteElection);
-ecRoutes
-    .route("/elections/start")
-    .patch([check("id").isMongoId()], startElection);
+ecRoutes.route("/elections/start").patch(
+    [
+        check("id")
+        .isMongoId()
+        .custom(async value => {
+            const election = await findElection({ _id: ObjectID(value) });
+            if (!election.positions || Object.keys(election.positions).length < 0) {
+                throw new Error("Election does not have registered candidates");
+            } else {
+                return value;
+            }
+        })
+    ],
+    startElection
+);
 ecRoutes.route("/elections/end").patch([check("id").isMongoId()], endElection);
 
 /**

@@ -9,9 +9,12 @@ const flash = require("connect-flash");
 const ecRoutes = require("./routes/ecRoutes");
 const voterRoutes = require("./routes/voterRoute");
 const { mongo_uri } = require("./utils/dbConfig");
+const moment = require("moment");
+
 const port = process.env.PORT || 3000;
 const app = express();
-
+// make the moment package glabally avialable within express
+app.locals.moment = moment;
 // set views directory and view templating engine to use
 app.set("views", "./src/views");
 app.set("view engine", "ejs");
