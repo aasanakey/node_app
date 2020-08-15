@@ -376,7 +376,8 @@ module.exports = {
         const r = await updateElection({ _id: ObjectId(req.body.election) },
             update
         );
-        res.json(r);
+        if (r) return res.json({ position: req.body.position });
+        return res.json({ msg: "Cannot delete postion" });
     },
     async removElectionCandidate(req, res) {
         const errors = validationResult(req);

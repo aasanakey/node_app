@@ -154,8 +154,9 @@
                                         // let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
                                         $(".position-candidates").html('');
                                         for (let position in res.positions) {
+                                            console.log(typeof position)
                                             $(".position-candidates").append(
-                                                `<div class="position mt-4">
+                                                `<div class="position mt-4" id="${position.replace(/' '/g, "_")}-container">
                                                     <div class="mb-3" style="display:inline-bock">
                                                         <p class="h4">${position}</p>
                                                         <button type="button"  class="btn btn-small btn-primary remove_position" data-election="${res._id}" data-position="${position}" title="Delete">
@@ -163,13 +164,13 @@
                                                         </button>
                                                     </div>  
                                                     <hr/>                                          
-                                                    <div class="row" id="${position.replace(" ", "_")}"></div>
+                                                    <div class="row" id="${position.replace(/' '/g, "_")}"></div>
                                                     
                                                 </div>`
                                             );
                                             res.positions[position].forEach(function(candidate) {
-                                                $(`#${position.replace(" ", "_")}`).append(
-                                                    `<div class="candidate col-sm-auto" id="${candidate.name.replace(" ", "_")}">
+                                                $(`#${position.replace(/' '/g, "_")}`).append(
+                                                    `<div class="candidate col-sm-auto" id="${candidate.name.replace(/' '/g, "_")}">
                                                         <figure>
                                                             <img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">
                                                             <figcaption>${candidate.name}</figcaption>
@@ -219,22 +220,35 @@
                     FilePond.parse(document.body);
 
                     $(".candidates-container").on("click", ".remove_position", function(event) {
-                        var position = $(this).data("position");
-                        var election = $(this).data("election");
-                        $.ajax({
-                            url: "/ec/election/remove/position",
-                            method: 'DELETE',
-                            data: {
-                                election: election,
-                                position: position
-                            },
-                            success: function(res) {
-                                console.log(res)
-                            },
-                            error: function(error) {
-                                console.log(error);
-                            },
-                        })
+                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                            var position = $(this).data("position");
+                            var election = $(this).data("election");
+                            $.ajax({
+                                url: "/ec/election/remove/position",
+                                method: 'DELETE',
+                                data: {
+                                    election: election,
+                                    position: position
+                                },
+                                success: function (res) {
+                                    
+                                    if (res.position) {
+                                        $(`#${res.position.replace(/' '/g, "_")}-container`).remove();
+                                    } else if (res.msg.startsWith("Cannot")) {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    }
+                                },
+                                error: function (error) {
+                                    console.log(error);
+                                },
+                            })
+                        }
+                    
                     });
                     $(".candidates-container").on("click", ".delete_candidate", function (event) {
                        if(confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")){
@@ -250,13 +264,13 @@
                                    candidate: candidate
                                },
                                success: function (res) {
-                                   console.log(res)
+                                //    console.log(res)
                                    if(res.candidate){
-                                       $(`#${res.candidate.replace(" ", "_")}`).remove();
+                                       $(`#${res.candidate.replace(/' '/g, "_")}`).remove();
                                    }else if( res.msg.startsWith("Cannot")){
                                         $('#messages').append(
                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            ${res.msg}: Please select a valid election
+                                            ${res.msg}
                                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button></div>`);
