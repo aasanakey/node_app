@@ -192,7 +192,7 @@
                                         for (let position in res.positions) {
                                            
                                             $(".position-candidates").append(
-                                                `<div class="position mt-4" id="${position.replace(/' '/g, "_")}-container">
+                                                `<div class="position mt-4" id="${position.replace(/ /g, '_')}-container">
                                                     <div class="mb-3" style="display:inline-bock">
                                                         <p class="h4">${position}</p>
                                                         <button type="button"  class="btn btn-small btn-primary remove_position" data-election="${res._id}" data-position="${position}" title="Delete">
@@ -200,13 +200,13 @@
                                                         </button>
                                                     </div>  
                                                     <hr/>                                          
-                                                    <div class="row" id="${position.replace(/' '/g, "_")}"></div>
+                                                    <div class="row" id="${position.replace(/ /g, '_')}"></div>
                                                     
                                                 </div>`
                                             );
                                             res.positions[position].forEach(function(candidate) {
-                                                $(`#${position.replace(/' '/g, "_")}`).append(
-                                                    `<div class="candidate col-sm-auto" id="${candidate.name.replace(/' '/g, "_")}">
+                                                $(`#${position.replace(/ /g, '_')}`).append(
+                                                    `<div class="candidate col-sm-auto" id="${candidate.name.replace(/ /g, '_')}">
                                                         <figure>
                                                             <img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">
                                                             <figcaption>${candidate.name}</figcaption>
@@ -281,7 +281,7 @@
                                 success: function (res) {
                                     
                                     if (res.position) {
-                                        $(`#${res.position.replace(/' '/g, "_")}-container`).remove();
+                                        $(`#${res.position.replace(/ /g, '_')}-container`).remove();
                                     } else if (res.msg.startsWith("Cannot")) {
                                         $('#messages').append(
                                             `<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -314,7 +314,7 @@
                                success: function (res) {
                                 //    console.log(res)
                                    if(res.candidate){
-                                       $(`#${res.candidate.name.replace(/' '/g, "_")}`).remove();
+                                       $(`#${res.candidate.name.replace(/ /g, '_')}`).remove();
                                    }else if( res.msg.startsWith("Cannot")){
                                         $('#messages').append(
                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
