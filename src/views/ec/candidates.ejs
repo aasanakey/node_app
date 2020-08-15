@@ -139,7 +139,7 @@
                 $(document).ready(function() {
                     $("#inputGroupSelectElection").on("change", function(e) {
                         let id = e.target.value;
-                        console.log(id);
+
                         $.ajax({
                             url: `/ec/candidates?id=${id}`,
                             success: function(res) {
@@ -152,8 +152,6 @@
                                             </button></div>`);
                                 } else {
                                     if (typeof res === "object") {
-                                        console.log("res is of type object")
-
                                         // let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
                                         $(".position-candidates").html('');
                                         for (let position in res) {
@@ -173,7 +171,7 @@
                                                         </figure>
                                                     </div>`);
                                             });
-                                            console.log(res[position])
+
                                         }
 
 

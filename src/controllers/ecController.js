@@ -1,18 +1,16 @@
 const {
-    url,
-    dbName,
-    connection,
-    conOpts,
     insertElection,
     updateElection,
     getElections,
     findElection,
+    removeElection,
     insertAdmin,
     removedAdmin,
     getAdmins,
     addCandidate,
     getelectionVoters,
-    addVoters
+    addVoters,
+    removeVoter
 } = require("../utils/dbConfig");
 const { ObjectId } = require("mongodb");
 const {
@@ -155,28 +153,13 @@ module.exports = {
             // req.flash("val_errors", errors.array());
             return res.json({ msg: "Invalid id" });
         }
-        (async function() {
-            let client;
-            try {
-                client = await connection.connect(url, conOpts);
-                const db = client.db(dbName);
-                const col = db.collection("elections");
-                let r = await col.findOneAndDelete({ _id: ObjectId(req.body.id) });
-                return r.value;
-            } catch (error) {
-                console.error(error);
-            } finally {
-                await client.close();
-            }
-        })()
-        .then(admin => {
-                if (admin != null) {
-                    res.json({ msg: "Election deleted successfully." });
-                } else {
-                    res.json({ msg: "Election does not exists" });
-                }
-            })
-            .catch(error => console.error(error));
+
+        const admin = removeElection({ _id: ObjectId(req.body.id) });
+        if (admin != null) {
+            res.json({ msg: "Election deleted successfully." });
+        } else {
+            res.json({ msg: "Election does not exists" });
+        }
     },
     async startElection(req, res) {
         const errors = validationResult(req);
@@ -339,7 +322,7 @@ module.exports = {
             // total_votes
         });
     },
-    async importVotersFromELXS(req, res) {
+    async importVotersFromXLSX(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             console.log(errors.array());
@@ -375,6 +358,20 @@ module.exports = {
         } else {
             req.flash("errors", "Failed to add voters");
             return res.redirect("back");
+        }
+    },
+    async deleteVoter(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors.array());
+            req.flash("val_errors", errors.array());
+            return res.json({ msg: "Invalid Voter id" });
+        }
+        const voter = removeVoter({ _id: ObjectId(req.body.id) });
+        if (voter != null) {
+            res.json({ msg: "Voter deleted successfully." });
+        } else {
+            res.json({ msg: "Voter does not exists" });
         }
     }
 };

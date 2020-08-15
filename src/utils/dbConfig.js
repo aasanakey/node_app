@@ -96,6 +96,21 @@ async function findElection(query = {}, options = {}) {
     }
 }
 
+async function removeElection(filterQuery, options) {
+    let client;
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("elections");
+        let r = await col.findOneAndDelete(filterQuery, options);
+        return r.value;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
+
 /**
  * Insert one document into admin collection
  * @param {*} data
@@ -126,13 +141,13 @@ async function insertAdmin(data) {
  * Find and remove a document from admins collection
  * @param {*} query
  */
-async function removedAdmin(query) {
+async function removedAdmin(query = {}, options = {}) {
     let client;
     try {
         client = await MongoClient.connect(mongo_uri, conOpts);
         const db = client.db(dbName);
         const col = db.collection("admins");
-        let r = await col.findOneAndDelete(query);
+        let r = await col.findOneAndDelete(query, options);
         return r.value;
     } catch (error) {
         console.error(error);
@@ -302,7 +317,20 @@ async function addVoters(doc = [], options = {}) {
         client.close();
     }
 }
-
+async function removeVoter(query = {}, options = {}) {
+    let client;
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection("voters");
+        let r = await col.findOneAndDelete(query, options);
+        return r.value;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
 module.exports = {
     mongo_uri,
     dbName,
@@ -312,6 +340,7 @@ module.exports = {
     updateElection,
     getElections,
     findElection,
+    removeElection,
     insertAdmin,
     removedAdmin,
     getAdmins,
@@ -320,5 +349,6 @@ module.exports = {
     getVoter,
     getelectionVoters,
     addVoters,
-    updateVoter
+    updateVoter,
+    removeVoter
 };

@@ -176,7 +176,8 @@
                                                     <th>Name</th>
                                                     <th>Action</th>
                                                 </thead>
-                                                <tbody></tbody>
+                                                <tbody>
+                                                </tbody>
                                                 <tfoot>
                                                     <th>Name</th>
                                                     <th>Action</th>
@@ -208,13 +209,13 @@
             <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
             <script>
                 $(document).ready(function() {
+                    var table = $('#voters').DataTable();
                     $("#inputGroupSelectElection").on("change", function(e) {
                         let id = e.target.value;
 
                         $.ajax({
                             url: `/ec/voters?id=${id}`,
                             success: function(res) {
-                                console.log(res, res.length)
                                 if (res.msg == "Invalid id") {
                                     $('#messages').append(
                                         `<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -225,13 +226,20 @@
                                 } else {
                                     if (res instanceof Array) {
                                         $("#voters tbody").html('');
-                                        if (res.length > 0) {
-                                            res.forEach(function(voter) {
-                                                $("#voters tbody").append(`<tr><td>${voter.username}</td><td>Action</td></tr>`);
-                                            });
-                                        } else {
-                                            $("#voters tbody").html(`<tr class="odd"><td valign="top" colspan="2" class="dataTables_empty">No data available in table</td></tr>`)
-                                        }
+                                        table.destroy();
+                                        table = $('#voters').DataTable({
+                                            data: res,
+                                            columns: [{
+                                                data: 'username'
+                                            }, {
+                                                value: null,
+                                                render: function(data, type, row, meta) {
+                                                    return '<button type="button" title="Delete" class="btn btn-small btn-primary mt-3 delete-btn action-btn">Delete</button>'
+                                                }
+                                            }, ]
+                                        });
+
+
                                     }
                                 }
                             },
@@ -240,7 +248,48 @@
                             }
                         })
                     })
-                    var table = $('#voters').DataTable();
+
+                     table.on('click', '.delete-btn', function (e) {
+                        // console.log(e)
+                        var tr = $(e.target).closest('tr');
+                        var data = table.row(tr).data();
+                        // console.log(data)
+                        if (confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")) {
+                            $.ajax({
+                                url: '/ec/voters',
+                                method: 'DELETE',
+                                data: {
+                                    id: data._id,
+                                },
+                                success: function (res) {
+                                    console.log(res);
+                                    if (res.msg == "Invalid id") {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            Can't delete election: ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    } else {
+                                        $('#messages').append(
+                                            `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            ${res.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                        
+                                            window.location.reload();
+                                        
+                                        
+                                    }
+                                },
+                                error: function (error) {
+                                    console.log(error);
+                                }
+                            })
+                        }
+                    });
+                    
                     // filepond setup
                     FilePond.registerPlugin(
                         FilePondPluginFileValidateType,

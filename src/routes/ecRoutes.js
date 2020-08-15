@@ -19,7 +19,8 @@ const {
     showElectionVoters,
     addElectionVoters,
     showElectionResults,
-    importVotersFromELXS
+    importVotersFromXLSX,
+    deleteVoter
 } = require("../controllers/ecController");
 const { getelectionVoters, findElection } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
@@ -154,7 +155,8 @@ ecRoutes
     .delete([check("id").isMongoId()], deleteAdmin);
 
 ecRoutes
-    .route("/voters")
+    .route("/voters/")
+    .all(ensureAdminIsAuthenticated)
     .get([query("id").isMongoId()], showElectionVoters)
     .post(
         [
@@ -190,22 +192,26 @@ ecRoutes
             .withMessage("Password is required")
         ],
         addElectionVoters
-    );
+    )
+    .delete([check("id").isMongoId()], deleteVoter);
 
-ecRoutes.route("/voters/import").post(
-    [
-        check("election_id")
-        .not()
-        .notEmpty()
-        .withMessage("Election field is required")
-        .bail(),
-        check("file")
-        .not()
-        .notEmpty()
-        .withMessage("Upload an excel file")
-    ],
-    importVotersFromELXS
-);
+ecRoutes
+    .route("/voters/import")
+    .all(ensureAdminIsAuthenticated)
+    .post(
+        [
+            check("election_id")
+            .not()
+            .notEmpty()
+            .withMessage("Election field is required")
+            .bail(),
+            check("file")
+            .not()
+            .notEmpty()
+            .withMessage("Upload an excel file")
+        ],
+        importVotersFromXLSX
+    );
 
 /**
  * Handle all requests to /ec/logout route
