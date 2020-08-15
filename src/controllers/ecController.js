@@ -394,5 +394,45 @@ module.exports = {
         );
         if (r) return res.json({ candidate: req.body.candidate });
         return res.json({ msg: "Cannot delete candidate" });
+    },
+    async editCandidate(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            //req.flash("val_errors", errors.array());
+            return res.json(errors.array());
+        }
+        let new_info = {};
+        if (req.body.new_name) {
+            new_info.name = req.body.new_name;
+        }
+        if (req.body.new_avatar) {
+            new_info.image = extractFilePondEncodedImage(req.body.new_avatar);
+        }
+        //form the filter query
+        let filter = { _id: ObjectId(req.body.election) };
+        filter[`positions.${req.body.position}.name`] = req.body.old_name;
+        let update = { $set: {} };
+        // update.$set[`positions.${req.body.position}.$`] = {};
+        let result;
+
+        if (new_info.name !== undefined && new_info.new_avatar !== undefined) {
+            update.$set[`positions.${req.body.position}.name`] = new_info.name;
+            update.$set[`positions.${req.body.position}.image`] = new_info.image;
+            result = await updateElection(filter, update);
+        } else if (
+            new_info.name !== undefined &&
+            new_info.new_avatar === undefined
+        ) {
+            update.$set[`positions.${req.body.position}.name`] = new_info.name;
+            result = await updateElection(filter, update);
+        } else if (
+            new_info.name === undefined &&
+            new_info.new_avatar !== undefined
+        ) {
+            update.$set[`positions.${req.body.position}.image`] = new_info.image;
+            result = await updateElection(filter, update);
+        }
+        console.log(filter, update);
+        res.json(result);
     }
 };

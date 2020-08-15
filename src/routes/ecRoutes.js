@@ -22,7 +22,8 @@ const {
     importVotersFromXLSX,
     deleteVoter,
     removElectionPosition,
-    removElectionCandidate
+    removElectionCandidate,
+    editCandidate
 } = require("../controllers/ecController");
 const { getelectionVoters, findElection } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
@@ -168,6 +169,22 @@ ecRoutes.delete(
         .withMessage("candidate name field is required")
     ],
     removElectionCandidate
+);
+
+ecRoutes.patch(
+    "/election/edit/candidate", [
+        check("election").isMongoId(),
+        check("position")
+        .not()
+        .notEmpty()
+        .withMessage("Candidate position is required"),
+        check("old_name")
+        .not()
+        .notEmpty()
+        .withMessage("Candidate's current name is required")
+    ],
+    ensureAdminIsAuthenticated,
+    editCandidate
 );
 
 /**

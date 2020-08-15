@@ -131,11 +131,7 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>`);
-                                    //wait for 1 min and reload page
-                                    let clear = setTimeout(function() {
-                                        location.reload()
-                                    }, 3000);
-                                    // clearInterval(clear);
+                                    window.location.reload();
                                 },
                                 error: function(error) {
                                     console.log(error);

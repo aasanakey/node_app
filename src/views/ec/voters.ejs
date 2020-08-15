@@ -210,7 +210,7 @@
             <script>
                 $(document).ready(function() {
                     var table = $('#voters').DataTable();
-                    $("#inputGroupSelectElection").on("change", function(e) {
+                    $("#inputGroupSelectElection").on("input", function(e) {
                         let id = e.target.value;
 
                         $.ajax({

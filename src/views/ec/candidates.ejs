@@ -116,18 +116,18 @@
                                         </div>
                                         <!-- candidate edit form modal -->
                                         <div id="edit-candidate" class="modal fade" aria-labelledby="editCandidateModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <p class="modal-title h5" id="editCandidateModalLabel">Modal title</p>
+                                                        <p class="modal-title h5" id="editCandidateModalLabel">Edit Candidate Details</p>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form action="">
+                                                        <form id="edit-candidate-form">
                                                             <div id="form-name">
-                                                                <div class="form-group col-md-6">
+                                                                <div class="form-group col-md-12">
                                                                     <label for="new_name">Name</label>
                                                                     <input type="text" class="form-control" name="new_name" id="new_name" autocomplete="new_name" required aria-required="true">
                                                                 </div>
@@ -144,7 +144,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                                        <button type="button" id="save-new-detials" class="btn btn-primary">Save changes</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -172,7 +172,7 @@
             <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
             <script>
                 $(document).ready(function() {
-                    $("#inputGroupSelectElection").on("change", function(e) {
+                    $("#inputGroupSelectElection").on("input", function(e) {
                         let id = e.target.value;
 
                         $.ajax({
@@ -208,7 +208,6 @@
                                                 $(`#${position.replace(/ /g, '_')}`).append(
                                                     `<div class="candidate col-sm-auto" id="${candidate.name.replace(/ /g, '_')}">
                                                         <figure>
-                                                            <img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">
                                                             <figcaption>${candidate.name}</figcaption>
                                                         </figure>
                                                         <div>
@@ -216,6 +215,9 @@
                                                             <button type="button"  class="delete_candidate btn btn-small btn-primary" data-election="${res._id}" data-position="${position}" data-candidate="${candidate.name}" title="Delete"><i class="fas fa-trash"></i></button>
                                                         </div>
                                                     </div>`);
+                                                    if(candidate.image){
+                                                        $(`#${position.replace(/ /g, '_')} figure`).prepend(`<img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">`);
+                                                    }
                                             });
 
                                         }
@@ -335,8 +337,68 @@
                         var position = $(this).data("position");
                         var election = $(this).data("election");
                         var candidate = $(this).data("candidate")
+                      //pass candidate detials to form
+                        var form = $("#edit-candidate-form")
+                        form.attr("data-position",position);
+                        form.attr("data-election",election);
+                        form.attr("data-candidate", candidate);
                         $("#new_name").val(candidate)
                     });
+
+                    $("#save-new-detials").on('click',function(event){
+                        var form = $("#edit-candidate-form");
+                        var data = {
+                            position:form.data("position"),
+                            election:form.data("election"),
+                            old_name: form.data("candidate"),
+                        }
+                        form.serializeArray().forEach(function(input){
+                            data[input.name] = input.value;
+                        });
+                        $('#edit-candidate').modal('toggle');
+                        $.ajax({
+                            method:"PATCH",
+                            url: "/ec/election/edit/candidate",
+                            data:data,
+                            success:function(res){
+                                console.log(res)
+                                if( res instanceof Array){
+                                    res.forEach(function (value) {
+                                        $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            ${value.msg}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    });
+                                }else{
+                                    if (res == null) {
+                                         $('#messages').append(
+                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                             Could not update candidate's detials.
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                    }else{
+                                        $('#messages').append(
+                                            `<div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            Candidate details updated successfully.
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                        window.location.reload();
+                                    }
+                                }
+                            }
+                        })
+                    });
+
+                    $('#edit-candidate').on('hidden.bs.modal', function (e) {
+                        form = $("#edit-candidate-form")
+                        form.removeAttr("data-position");
+                        form.removeAttr("data-election")
+                        form.removeAttr("data-candidate");
+                    })
                 })
             </script>
 </body>
