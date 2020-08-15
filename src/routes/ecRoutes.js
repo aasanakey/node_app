@@ -20,7 +20,9 @@ const {
     addElectionVoters,
     showElectionResults,
     importVotersFromXLSX,
-    deleteVoter
+    deleteVoter,
+    removElectionPosition,
+    removElectionCandidate
 } = require("../controllers/ecController");
 const { getelectionVoters, findElection } = require("../utils/dbConfig");
 const ecRoutes = express.Router();
@@ -132,6 +134,42 @@ ecRoutes.route("/elections/start").patch(
 );
 ecRoutes.route("/elections/end").patch([check("id").isMongoId()], endElection);
 
+ecRoutes.delete(
+    "/election/remove/position",
+    ensureAdminIsAuthenticated, [
+        check("election")
+        .not()
+        .notEmpty()
+        .withMessage("election field is required")
+        .bail()
+        .isMongoId(),
+        check("position")
+        .notEmpty()
+        .withMessage("position field is required")
+    ],
+    removElectionPosition
+);
+
+ecRoutes.delete(
+    "/election/remove/candidate",
+    ensureAdminIsAuthenticated, [
+        check("election")
+        .not()
+        .notEmpty()
+        .withMessage("election field is required")
+        .bail()
+        .isMongoId(),
+        check("position")
+        .notEmpty()
+        .withMessage("position field is required"),
+        check("candidate")
+        .not()
+        .notEmpty()
+        .withMessage("candidate name field is required")
+    ],
+    removElectionCandidate
+);
+
 /**
  * Handle all requests to /ec/admins route
  */
@@ -220,6 +258,7 @@ ecRoutes.route("/logout").get(logout);
 
 /**
  * must be the last handler for /ec/* to prevent error be throw by express validator (Invalid MongoID)
+ * for other routes
  */
 ecRoutes
     .route("/result/:id")

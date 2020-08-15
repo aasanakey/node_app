@@ -120,7 +120,6 @@
                                             <%}%>
                                 </div>
 
-
                             </div>
                         </div>
                     </main>
@@ -151,24 +150,34 @@
                                                 <span aria-hidden="true">&times;</span>
                                             </button></div>`);
                                 } else {
-                                    if (typeof res === "object") {
+                                    if (res.positions) {
                                         // let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
                                         $(".position-candidates").html('');
-                                        for (let position in res) {
+                                        for (let position in res.positions) {
                                             $(".position-candidates").append(
-                                                `<div class="position">
-                                                    <p class="separator">${position}</p>                                            
+                                                `<div class="position mt-4">
+                                                    <div class="mb-3" style="display:inline-bock">
+                                                        <p class="h4">${position}</p>
+                                                        <button type="button"  class="btn btn-small btn-primary remove_position" data-election="${res._id}" data-position="${position}" title="Delete">
+                                                            Remove Position
+                                                        </button>
+                                                    </div>  
+                                                    <hr/>                                          
                                                     <div class="row" id="${position.replace(" ", "_")}"></div>
-                                                    <hr class="special">
+                                                    
                                                 </div>`
                                             );
-                                            res[position].forEach(function(candidate) {
+                                            res.positions[position].forEach(function(candidate) {
                                                 $(`#${position.replace(" ", "_")}`).append(
-                                                    `<div class="candidate col-sm-auto">
+                                                    `<div class="candidate col-sm-auto" id="${candidate.name.replace(" ", "_")}">
                                                         <figure>
                                                             <img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">
                                                             <figcaption>${candidate.name}</figcaption>
                                                         </figure>
+                                                        <div>
+                                                            <button type="button"  class="edit_candidate btn btn-small btn-primary" data-election="${res._id}" data-position="${position}" data-candidate="${candidate.name}" title="Edit"><i class="fas fa-edit"></i></button>
+                                                            <button type="button"  class="delete_candidate btn btn-small btn-primary" data-election="${res._id}" data-position="${position}" data-candidate="${candidate.name}" title="Delete"><i class="fas fa-trash"></i></button>
+                                                        </div>
                                                     </div>`);
                                             });
 
@@ -208,6 +217,57 @@
                     })
 
                     FilePond.parse(document.body);
+
+                    $(".candidates-container").on("click", ".remove_position", function(event) {
+                        var position = $(this).data("position");
+                        var election = $(this).data("election");
+                        $.ajax({
+                            url: "/ec/election/remove/position",
+                            method: 'DELETE',
+                            data: {
+                                election: election,
+                                position: position
+                            },
+                            success: function(res) {
+                                console.log(res)
+                            },
+                            error: function(error) {
+                                console.log(error);
+                            },
+                        })
+                    });
+                    $(".candidates-container").on("click", ".delete_candidate", function (event) {
+                       if(confirm("Are you shure you want to delete record\nThis action will lead to permanent loss of data")){
+                            var position = $(this).data("position");
+                           var election = $(this).data("election");
+                           var candidate = $(this).data("candidate")
+                           $.ajax({
+                               url: "/ec/election/remove/candidate",
+                               method: 'DELETE',
+                               data: {
+                                   election: election,
+                                   position: position,
+                                   candidate: candidate
+                               },
+                               success: function (res) {
+                                   console.log(res)
+                                   if(res.candidate){
+                                       $(`#${res.candidate.replace(" ", "_")}`).remove();
+                                   }else if( res.msg.startsWith("Cannot")){
+                                        $('#messages').append(
+                                           `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            ${res.msg}: Please select a valid election
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                   }
+                               },
+                               error: function (error) {
+                                   console.log(error);
+                               },
+                           });
+                       }
+                    });
                 })
             </script>
 </body>

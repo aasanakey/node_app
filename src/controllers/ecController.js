@@ -77,7 +77,6 @@ module.exports = {
     async deleteAdmin(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             //    req.flash("val_errors", errors.array());
             return res.json({ msg: "Invalid id" });
         }
@@ -97,7 +96,6 @@ module.exports = {
     async createElection(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             req.flash("val_errors", errors.array());
             return res.redirect("back");
         }
@@ -149,7 +147,6 @@ module.exports = {
     async deleteElection(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             // req.flash("val_errors", errors.array());
             return res.json({ msg: "Invalid id" });
         }
@@ -164,7 +161,6 @@ module.exports = {
     async startElection(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             // req.flash("val_errors", errors.array());
             return res.json(errors.array());
         }
@@ -178,7 +174,6 @@ module.exports = {
     async endElection(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             // req.flash("val_errors", errors.array());
             return res.json({ msg: "Invalid id" });
         }
@@ -214,8 +209,7 @@ module.exports = {
                 return res.json({ msg: "Invalid id" });
             }
             let positions = await findElection({ _id: ObjectId(req.query.id) }, { projection: { positions: true } });
-            positions = positions.positions;
-            console.log(positions);
+            // positions = positions.positions;
             if (positions === undefined) return res.json("error");
             return res.json(positions);
         }
@@ -227,7 +221,6 @@ module.exports = {
     async addElectionCandidate(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             req.flash("val_errors", errors.array());
             return res.redirect("back");
         }
@@ -274,7 +267,6 @@ module.exports = {
     async addElectionVoters(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             // const input = [req.body.election_id,req.body.username]
             req.flash("val_errors", errors.array());
             return res.redirect("back");
@@ -325,7 +317,6 @@ module.exports = {
     async importVotersFromXLSX(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             req.flash("val_errors", errors.array());
             return res.redirect("back");
         }
@@ -363,7 +354,6 @@ module.exports = {
     async deleteVoter(req, res) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            console.log(errors.array());
             req.flash("val_errors", errors.array());
             return res.json({ msg: "Invalid Voter id" });
         }
@@ -373,5 +363,35 @@ module.exports = {
         } else {
             res.json({ msg: "Voter does not exists" });
         }
+    },
+    async removElectionPosition(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            req.flash("val_errors", errors.array());
+            return res.json({ msg: "Invalid Voter id" });
+        }
+        let update = { $unset: {} };
+
+        update.$unset[`positions.${req.body.position}`] = "";
+        const r = await updateElection({ _id: ObjectId(req.body.election) },
+            update
+        );
+        res.json(r);
+    },
+    async removElectionCandidate(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            req.flash("val_errors", errors.array());
+            return res.json({ msg: "Invalid Voter id" });
+        }
+        let update = { $pull: {} };
+        update.$pull[`positions.${req.body.position}`] = {
+            name: req.body.candidate
+        };
+        const r = await updateElection({ _id: ObjectId(req.body.election) },
+            update
+        );
+        if (r) return res.json({ candidate: req.body.candidate });
+        return res.json({ msg: "Cannot delete candidate" });
     }
 };
