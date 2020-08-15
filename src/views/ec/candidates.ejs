@@ -74,7 +74,7 @@
                                                             <div class="form-row">
                                                                 <div class="col-md-12">
                                                                     <label for="avatar">Picture</label>
-                                                                    <input type="file" name="avatar" id="avatar" class="filepond">
+                                                                    <input type="file" name="avatar" id="avatar" class="filepond" accept="'image/svg+xml','image/jpeg', 'image/png'">
                                                                 </div>
                                                             </div>
                                                         </form>
@@ -114,6 +114,41 @@
                                                 <p class="h4">Select an election to view candidates</p>
                                             </div>
                                         </div>
+                                        <!-- candidate edit form modal -->
+                                        <div id="edit-candidate" class="modal fade" aria-labelledby="editCandidateModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <p class="modal-title h5" id="editCandidateModalLabel">Modal title</p>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="">
+                                                            <div id="form-name">
+                                                                <div class="form-group col-md-6">
+                                                                    <label for="new_name">Name</label>
+                                                                    <input type="text" class="form-control" name="new_name" id="new_name" autocomplete="new_name" required aria-required="true">
+                                                                </div>
+                                                            </div>
+                                                            <div id="form-image">
+                                                                <div class="form-row">
+                                                                    <div class="col-md-12">
+                                                                        <label for="new_avatar">Picture</label>
+                                                                        <input type="file" name="new_avatar" id="new_avatar" class="filepond" accept="image/svg+xml,image/jpeg,image/png">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                         <%}else{%>
                                             <p class="h3">No elections available</p>
@@ -128,6 +163,7 @@
         </div>
         <%- include('../includes/dash/scripts') -%>
             <!-- filepond dependencies for fileupload -->
+            <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
             <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
             <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
             <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
@@ -154,7 +190,7 @@
                                         // let imageSrc = `data:${imagetype};charset=utf-8;base64,${data.toString("base64")}`
                                         $(".position-candidates").html('');
                                         for (let position in res.positions) {
-                                            console.log(typeof position)
+                                           
                                             $(".position-candidates").append(
                                                 `<div class="position mt-4" id="${position.replace(/' '/g, "_")}-container">
                                                     <div class="mb-3" style="display:inline-bock">
@@ -203,6 +239,7 @@
 
                     // filepond setup
                     FilePond.registerPlugin(
+                        FilePondPluginFileValidateType,
                         FilePondPluginImagePreview,
                         FilePondPluginFileValidateSize,
                         FilePondPluginImageResize,
@@ -211,6 +248,17 @@
                     )
 
                     FilePond.setOptions({
+                        acceptedFileTypes: [
+                            'image/svg+xml',
+                            'image/jpeg', 
+                            'image/png'
+                        ],
+                        fileValidateTypeLabelExpectedTypes: 'Expects .svg,.png,.jpeg or .jpg',
+                        fileValidateTypeLabelExpectedTypesMap:{ 
+                            'image/jpeg': '.jpg,.jpeg' ,
+                            'image/png': '.png',
+                            'image/svg+xml':'.svg'
+                        },
                         stylePanelAspectRatio: 100 / 100,
                         imageResizeTargetWidth: 100,
                         imageResizeTargetHeight: 100,
@@ -266,7 +314,7 @@
                                success: function (res) {
                                 //    console.log(res)
                                    if(res.candidate){
-                                       $(`#${res.candidate.replace(/' '/g, "_")}`).remove();
+                                       $(`#${res.candidate.name.replace(/' '/g, "_")}`).remove();
                                    }else if( res.msg.startsWith("Cannot")){
                                         $('#messages').append(
                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -281,6 +329,13 @@
                                },
                            });
                        }
+                    });
+                    $(".candidates-container").on("click", ".edit_candidate", function (event) {
+                        $('#edit-candidate').modal('toggle')
+                        var position = $(this).data("position");
+                        var election = $(this).data("election");
+                        var candidate = $(this).data("candidate")
+                        $("#new_name").val(candidate)
                     });
                 })
             </script>

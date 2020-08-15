@@ -208,7 +208,7 @@ async function addCandidate(candidate) {
      * if not we create one and add candidate to the candidates array
      * if document has positions field object we add new candidate to the positions candidates array
      */
-    // console.log("before if", positions);
+    candidate.position = candidate.position.toUpperCase();
     if (positions === undefined) {
         // console.log("in if 1", positions);
         let posObj = {};
