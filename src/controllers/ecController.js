@@ -336,6 +336,8 @@ module.exports = {
                 let elections = {};
                 elections[req.body.election_id] = [];
                 voter["elections"] = elections;
+                voter.username = voter.username.trim();
+                voter.password = voter.password.trim();
                 hash(voter.password).then(password => (voter.password = password));
                 return voter;
             });
