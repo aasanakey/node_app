@@ -22,11 +22,18 @@
                     <%- include('../includes/messages') -%>
                 </div>
                 <div class="list-group">
-                    <%elections.forEach(function(election){%>
-                        <a href="/voter/vote/<%=election._id%>/first" class="list-group-item list-group-item-action">
-                            <%=election.name%>
-                                Elections</a>
-                        <%})%>
+                    <%if(elections){%>
+                        <%elections.forEach(function(election){%>
+                            <a href="/voter/vote/<%=election._id%>/first" class="list-group-item list-group-item-action">
+                                <%=election.name%>
+                            </a>
+                            <%})%>
+                                <%}else{%>
+                                    <div class="alert alert-info" role="alert">
+                                        No Elections available for you.
+                                        <a href="/voter/logout" class=" btn btn-small btn-primary">Logout</a>
+                                    </div>
+                                    <%}%>
                 </div>
             </div>
         </main>
