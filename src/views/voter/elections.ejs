@@ -22,7 +22,7 @@
                     <%- include('../includes/messages') -%>
                 </div>
                 <div class="list-group">
-                    <%if(elections){%>
+                    <%if(elections.length > 0){%>
                         <%elections.forEach(function(election){%>
                             <a href="/voter/vote/<%=election._id%>/first" class="list-group-item list-group-item-action">
                                 <%=election.name%>
