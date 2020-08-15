@@ -314,7 +314,7 @@
                                success: function (res) {
                                 //    console.log(res)
                                    if(res.candidate){
-                                       $(`#${res.candidate.name.replace(/ /g, '_')}`).remove();
+                                       $(`#${res.candidate.replace(/ /g, '_')}`).remove();
                                    }else if( res.msg.startsWith("Cannot")){
                                         $('#messages').append(
                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
