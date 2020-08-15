@@ -216,7 +216,7 @@
                                                         </div>
                                                     </div>`);
                                                     if(candidate.image){
-                                                        $(`#${position.replace(/ /g, '_')} figure`).prepend(`<img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">`);
+                                                        $(`#${candidate.name.replace(/ /g, '_')} figure`).prepend(`<img src="data:${candidate.image.type};charset=utf-8;base64,${candidate.image.data.toString("base64")}" alt="${candidate.name}">`);
                                                     }
                                             });
 
