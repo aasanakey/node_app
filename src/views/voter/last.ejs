@@ -44,9 +44,14 @@
                                     </div>
                                 </div>
                                 <div class="vote">
-                                    <p class="h5 text-white">Choice:
-                                        <%=votes[position]%>
-                                    </p>
+                                    <%if(votes[position]){%>
+                                        <p class="h5 text-white">Choice:
+                                            <%=votes[position]%>
+                                        </p>
+                                        <%}else{%>
+                                            <p class="h5 text-white">Choice: None</p>
+
+                                            <%}%>
                                 </div>
                                 <hr class="special">
                             </div>

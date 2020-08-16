@@ -40,6 +40,13 @@
   margin-left: auto;
 }
 
+.avatar() {
+  padding: 0.3em;
+  // border-radius: 100%;
+  border: 2px solid white;
+  width: 150px;
+  height: 150px;
+}
 //imports
 @import "bootstrap/dist/css/bootstrap.css";
 @import "@fortawesome/fontawesome-free/less/fontawesome.less";
@@ -166,11 +173,7 @@ i.pass__toggle--visibility {
     figure {
       .figure();
       img {
-        padding: 0.3em;
-        border-radius: 100%;
-        border: 2px solid white;
-        width: 150px;
-        height: 150px;
+        .avatar();
         &:hover {
           background: @candidate-hover-bg; //orange;
         }
@@ -227,11 +230,8 @@ i.pass__toggle--visibility {
           .figure();
 
           img {
-            padding: 0.3em;
-            border-radius: 100%;
-            border: 2px solid white;
-            width: 10em;
-            height: 10em;
+            .avatar();
+
             &:hover {
               background: @candidate-hover-bg; //orange;
             }
@@ -258,11 +258,7 @@ i.pass__toggle--visibility {
       figure {
         .figure();
         img {
-          padding: 0.3em;
-          border-radius: 100%;
-          border: 2px solid white;
-          width: 10em;
-          height: 10em;
+          .avatar();
         }
       }
     }

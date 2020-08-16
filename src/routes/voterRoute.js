@@ -73,6 +73,15 @@ voterRoutes
         saveVote
     );
 
+// voterRoutes.get("/thanks", (req, res) => {
+//     return res.render("voter/last", {
+//         title: `Success | ${process.env.APP_NAME}`,
+//         position: "Success",
+//         candidates: req.query.candidates,
+//         votes: req.query.votes,
+//         next: "/voter/logout"
+//     });
+// });
 voterRoutes.route("/logout").get(logout);
 
 module.exports = voterRoutes;

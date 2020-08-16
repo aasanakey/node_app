@@ -83,18 +83,28 @@
                             data: {
                                 election: "<%=election%>",
                                 position: "<%=position%>",
-                                choice: input.value
+                                choice: input.value,
+                                next_page: "/voter/vote/<%=election%>/<%=next%>",
                             },
                             success: function(res) {
                                 console.log(res);
                                 if (res instanceof Array) {
                                     res.forEach(function(value) {
-                                        $('#messages').append(
-                                            `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        if (value.next) {
+                                            $('#messages').append(
+                                                `<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            ${value.msg}!   <a href="${value.next}">Next</a>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button></div>`);
+                                        } else {
+                                            $('#messages').append(
+                                                `<div class="alert alert-danger alert-dismissible fade show" role="alert">
                                             ${value.msg}
                                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button></div>`);
+                                        }
                                     });
                                 }
                                 if (res.msg == "Ok") {
