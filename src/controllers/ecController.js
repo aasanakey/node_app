@@ -300,18 +300,22 @@ module.exports = {
             return res.redirect("back");
         }
         //compute total votes for each positon
-        // const total_votes = {};
-        // Object.keys(election.positions).forEach(position => {
-        //     total_votes[position] = 0;
-        //     election.positions[position].forEach(candidate => {
-        //         total_votes[position] += candidate.votes;
-        //     });
-        // });
-        // console.log(total_votes);
+        const total_votes = {};
+        let actual_voter_count = 0;
+        Object.keys(election.positions).forEach(position => {
+            total_votes[position] = 0;
+            election.positions[position].forEach(candidate => {
+                total_votes[position] += candidate.votes;
+            });
+            actual_voter_count = Math.max(total_votes[position], actual_voter_count);
+            console.log(actual_voter_count);
+        });
+        console.log(total_votes, actual_voter_count);
         res.render("ec/election_result", {
             title: `EC - Results | ${process.env.APP_NAME}`,
-            election
-            // total_votes
+            election,
+            total_votes,
+            actual_voter_count
         });
     },
     async importVotersFromXLSX(req, res) {

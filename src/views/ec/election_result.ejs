@@ -51,10 +51,10 @@
                                                                 </figcaption>
                                                             </figure>
                                                             <div class="gr">
-                                                                <%if(election.voter_count > 0){%>
+                                                                <%if(actual_voter_count > 0){%>
                                                                     <div class="progress">
-                                                                        <div class="progress-bar" role="progressbar" style="width: <%=Number(((candidate.votes/election.voter_count) * 100)).toFixed(2)%>%;" aria-valuenow="<%=Number(((candidate.votes/election.voter_count) * 100)).toFixed(2)%>" aria-valuemin="0" aria-valuemax="100">
-                                                                            <%=Number(((candidate.votes/election.voter_count) * 100)).toFixed(2)%>%
+                                                                        <div class="progress-bar" role="progressbar" style="width: <%=Number(((candidate.votes/actual_voter_count) * 100)).toFixed(2)%>%;" aria-valuenow="<%=Number(((candidate.votes/actual_voter_count) * 100)).toFixed(2)%>" aria-valuemin="0" aria-valuemax="100">
+                                                                            <%=Number(((candidate.votes/actual_voter_count) * 100)).toFixed(2)%>%
                                                                         </div>
                                                                     </div>
                                                                     <%}else{%>
@@ -67,7 +67,7 @@
                                                                             <p>
                                                                                 Votes=
                                                                                 <%=candidate.votes%> out of
-                                                                                    <%=election.voter_count%>
+                                                                                    <%=actual_voter_count%>
                                                                             </p>
                                                             </div>
                                                         </div>
@@ -77,10 +77,16 @@
                                             <hr class="special">
                                         </div>
                                         <%})%>
-                                            <div class="text-left">
-                                                <p>Total Votes Cast =
+                                            <div class="text-left text-white">
+                                                <p class="d-inline-block mr-2 h5">Total Votes Cast =
+                                                    <%=actual_voter_count%>
+                                                </p>
+                                                <p class="d-inline-block mr-2 h5">Total Voting attempts =
                                                     <%=election.voter_count%>
                                                 </p>
+                                                <!-- <p class="d-inline-block mr-2 h5">Total registered voters =
+                                                    <%=election.voter_count%>
+                                                </p> -->
                                             </div>
                                 </div>
                                 <%}%>
