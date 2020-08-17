@@ -6,14 +6,21 @@
         <style>
             @media print {
                 footer,
+                #layoutSidenav_nav,
+                .sb-topnav,
                 .btn-print {
                     display: none;
                 }
+                html,
+                body {
+                    height: fit-content;
+                    height: -webkit-fit-content;
+                    height: -moz-fit-content;
+                }
                 .election-results {
-                    position: fixed;
-                    top: 0 !important;
-                    margin: 0 !important;
-                    width: 99.9% !important;
+                    margin-top: 2.5pt !important;
+                    margin-bottom: 2.5pt !important;
+                    width: 100% !important;
                 }
             }
         </style>
@@ -31,7 +38,7 @@
                                 <div class="election-results mt-5 mb-5">
                                     <div class="header">
                                         <p class="h2 text-center">Election Result</p>
-                                        <button class="btn btn-primary btn-small btn-print" onclick="window.print();">Print</button>
+                                        <button class="btn btn-primary btn-small btn-print" onclick="window.print();" id="printResults">Print</button>
                                     </div>
                                     <hr class="special">
                                     <%Object.keys(election.positions).forEach(function(position){%>
@@ -96,6 +103,38 @@
                 </div>
         </div>
         <%- include('../includes/dash/scripts') -%>
+            <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.0.12/purify.min.js"></script> -->
+            <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script> -->
+            <!-- <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+            <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script> -->
+            <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.0.0/jspdf.umd.min.js"></script> -->
+            <script>
+                /*$(document).ready(function() {
+                                                                                                                    function printResults() {
+                                                                                                                        const results = new jspdf.jsPDF({
+                                                                                                                            orientation: 'p',
+                                                                                                                            unit: 'mm',
+                                                                                                                            format: 'a4',
+                                                                                                                            // putOnlyUsedFonts: true,
+                                                                                                                            floatPrecision: "smart", //default is 16
+                                                                                                                        });
+                                                                                                                        results.setFontSize(10)
+                                                                                                                        var content = $(".election-results").html();
+                                                                                                                        results.html(content, {
+                                                                                                                            callback: function(results) {
+                                                                                                                                results.autoPrint({
+                                                                                                                                    variant: 'non-conform'
+                                                                                                                                });
+                                                                                                                                results.save("Election Results");
+                                                                                                                            }
+                                                                                                                        })
+                                                                                                                    }
+
+                                                                                                                    $("#printResults").on('click', function(event) {
+                                                                                                                        printResults();
+                                                                                                                    });
+                                                                                                                })*/
+            </script>
 </body>
 
 </html>
