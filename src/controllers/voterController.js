@@ -134,7 +134,9 @@ module.exports = {
             const next_index = keys.indexOf(current) + 1;
             next = next_index !== keys.length ? keys[next_index] : "last";
         }
-
+        // console.log(`"${current}","${req.params.position}"`, keys);
+        // current = current.trim();
+        // console.log(`"${current}"`);
         return res.render("voter/candidates", {
             title: `${current} | ${process.env.APP_NAME}`,
             position: current,
@@ -152,32 +154,31 @@ module.exports = {
         /**
          * check if request parameters have not been tampered with
          */
-        //console.log(req.body, req.params);
-        // if (
-        //     req.body.election === req.params.election &&
-        //     req.body.position === req.params.position
-        // ) {
-        /**
-         * check if voter has already submited votes for this position
-         */
         if (
-            req.user.elections[req.body.election].includes(req.body.position) ||
-            req.user.track_elections.includes(req.body.position)
+            req.body.election === req.params.election &&
+            req.body.position === req.params.position
         ) {
-            return res.json([{
-                msg: "You have already cast your vote for this position",
-                next: req.body.next_page
-            }]);
-        }
-        /**
-         * save votes
-         */
+            /**
+             * check if voter has already submited votes for this position
+             */
+            if (
+                req.user.elections[req.body.election].includes(req.body.position) ||
+                req.user.track_elections.includes(req.body.position)
+            ) {
+                return res.json([{
+                    msg: "You have already cast your vote for this position",
+                    next: req.body.next_page
+                }]);
+            }
+            /**
+             * save votes
+             */
 
-        req.user.votes[req.body.election][req.body.position] = req.body.choice;
-        req.user.track_elections.push(req.body.position);
-        return res.json({ msg: "Ok" });
-        //}//
-        // return res.json([{ msg: "Request parameters have been tampered with" }]);
+            req.user.votes[req.body.election][req.body.position] = req.body.choice;
+            req.user.track_elections.push(req.body.position);
+            return res.json({ msg: "Ok" });
+        }
+        return res.json([{ msg: "Request parameters have been tampered with" }]);
     },
     logout(req, res) {
         req.logout(req.user);

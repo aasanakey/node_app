@@ -54,8 +54,8 @@ module.exports = {
         }
         //create admin object from input data
         let data = {
-            username: req.body.username,
-            password: req.body["new-password"]
+            username: req.body.username.trim(),
+            password: req.body["new-password"].trim()
         };
         data.password = await hash(data.password); //hash plain text password
         const result = await insertAdmin(data);
@@ -276,8 +276,8 @@ module.exports = {
          * Add voter object and add to collection
          */
         let data = {
-            username: req.body.username,
-            password: req.body["new-password"],
+            username: req.body.username.trim(),
+            password: req.body["new-password"].trim(),
             elections: {}
         };
         data.password = await hash(data.password); //hash plain text password
