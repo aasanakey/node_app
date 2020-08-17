@@ -10,7 +10,8 @@ const {
     addCandidate,
     getelectionVoters,
     addVoters,
-    removeVoter
+    removeVoter,
+    countCollectionDocuments
 } = require("../utils/dbConfig");
 const { ObjectId } = require("mongodb");
 const {
@@ -300,22 +301,37 @@ module.exports = {
             return res.redirect("back");
         }
         //compute total votes for each positon
-        const total_votes = {};
-        let actual_voter_count = 0;
-        Object.keys(election.positions).forEach(position => {
-            total_votes[position] = 0;
-            election.positions[position].forEach(candidate => {
-                total_votes[position] += candidate.votes;
-            });
-            actual_voter_count = Math.max(total_votes[position], actual_voter_count);
-            console.log(actual_voter_count);
-        });
-        console.log(total_votes, actual_voter_count);
+        // const total_votes = {};
+        // let actual_voter_count = 0;
+        // Object.keys(election.positions).forEach(position => {
+        //     total_votes[position] = 0;
+        //     election.positions[position].forEach(candidate => {
+        //         total_votes[position] += candidate.votes;
+        //     });
+        //     actual_voter_count = Math.max(total_votes[position], actual_voter_count);
+        //     // console.log(actual_voter_count);
+        // });
+        let filer_registered_voters = {};
+        let filer_voters_has_voted = {};
+        filer_registered_voters[`elections.${req.params.id}`] = { $exists: true };
+        filer_voters_has_voted[`elections.${req.params.id}`] = {
+            $exists: true,
+            $ne: []
+        };
+        const registered_voters = await countCollectionDocuments(
+            "voters",
+            filer_registered_voters
+        );
+        const voters_has_voted = await countCollectionDocuments(
+            "voters",
+            filer_voters_has_voted
+        );
+        console.log(registered_voters, voters_has_voted);
         res.render("ec/election_result", {
             title: `EC - Results | ${process.env.APP_NAME}`,
             election,
-            total_votes,
-            actual_voter_count
+            total_votes: voters_has_voted,
+            total_registered_voters: registered_voters
         });
     },
     async importVotersFromXLSX(req, res) {

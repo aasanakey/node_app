@@ -332,6 +332,21 @@ async function removeVoter(query = {}, options = {}) {
         await client.close();
     }
 }
+
+async function countCollectionDocuments(collection = "", query = {}, options = {}) {
+    let client;
+    try {
+        client = await MongoClient.connect(mongo_uri, conOpts);
+        const db = client.db(dbName);
+        const col = db.collection(collection);
+        let result = await col.count(query, options);
+        return result;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        await client.close();
+    }
+}
 module.exports = {
     mongo_uri,
     dbName,
@@ -351,5 +366,6 @@ module.exports = {
     getelectionVoters,
     addVoters,
     updateVoter,
-    removeVoter
+    removeVoter,
+    countCollectionDocuments
 };
