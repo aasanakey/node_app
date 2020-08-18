@@ -326,7 +326,7 @@ module.exports = {
             "voters",
             filer_voters_has_voted
         );
-        console.log(registered_voters, voters_has_voted);
+        // console.log(registered_voters, voters_has_voted);
         res.render("ec/election_result", {
             title: `EC - Results | ${process.env.APP_NAME}`,
             election,
@@ -454,7 +454,14 @@ module.exports = {
             update.$set[`positions.${req.body.position}.image`] = new_info.image;
             result = await updateElection(filter, update);
         }
-        console.log(filter, update);
+        // console.log(filter, update);
         res.json(result);
     }
 };
+
+/*TODO
+ * Add edit elections
+ * check if candidate name does not exist in before adding
+ * check if voter does not exist before addding
+ * Edit candidate name and picture
+ */

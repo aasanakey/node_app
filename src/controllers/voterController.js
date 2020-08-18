@@ -24,13 +24,13 @@ async function saveVoteInDB(user, election_id, positions, voter_id) {
         if (current_votes[key] == "No") return;
         positions[key][candidate_index].votes += 1;
     });
-    console.log(positions);
+    // console.log(positions);
     //write data to database
     await updateElection({ _id: ObjectID(election_id) }, { $set: { positions: positions }, $inc: { voter_count: 1 } });
     //update voter status
     let update = { $addToSet: {} };
     update.$addToSet[`elections.${election_id}`] = { $each: current_votes_keys };
-    console.log("\n\n", update);
+    // console.log("\n\n", update);
     await updateVoter({ _id: ObjectID(voter_id) }, update);
 }
 
