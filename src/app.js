@@ -23,7 +23,7 @@ app.locals.assets = url => {
 };
 
 // set views directory and view templating engine to use
-app.set("views", "./src/views");
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 /**
