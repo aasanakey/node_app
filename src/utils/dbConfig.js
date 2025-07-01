@@ -3,7 +3,10 @@ const dbName = process.env.DB_NAME;
 const mongo_uri = process.env.MONGO_URL;
 const conOpts = {
     useUnifiedTopology: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    ssl: true,
+    retryWrites: true,
+    writeConcern: { w: "majority" }
 };
 
 /**
