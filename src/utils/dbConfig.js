@@ -4,9 +4,6 @@ const mongo_uri = process.env.MONGO_URL;
 const conOpts = {
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    ssl: true,
-    retryWrites: true,
-    writeConcern: { w: "majority" }
 };
 
 /**
