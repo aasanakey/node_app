@@ -4,12 +4,12 @@
  */
 
 admins = {
-    username: "string"
+    username: "string",
     password: "string"
 }
 
 voter = {
-    username: "string"
+    username: "string",
     password: "string"
 }
 
